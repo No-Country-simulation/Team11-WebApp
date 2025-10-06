@@ -1,0 +1,12 @@
+# Ignorar configuración local de Spring Boot
+/src/main/resources/application.properties
+/src/test/resources/application.properties
+
+# Carpeta target de Maven
+/target/
+
+# Archivos de logs
+*.log
+
+# Archivos de NetBeans
+nbproject/private/
