@@ -1,13 +1,18 @@
-import React from 'react'
-import { Routes, Route } from 'react-router-dom'
-import Home from '../../features/home/pages/Home'
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import HomeLayout from "../layouts/HomeLayout";
+import HomePage from "../../features/home/pages/HomePage";
+import AboutUsPage from "../../features/home/pages/AboutUsPage";
+import FinancingPage from "../../features/home/pages/FinancingPage";
 
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route element={<HomeLayout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/nosotros" element={<AboutUsPage />} />
+        <Route path="/financiamiento" element={<FinancingPage />} />
+      </Route>
     </Routes>
-  )
+  );
 }
-
-
