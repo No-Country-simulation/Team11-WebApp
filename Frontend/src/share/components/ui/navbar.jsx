@@ -9,25 +9,25 @@ const Navbar = () => {
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
-            <button className="text-2xl font-bold">
-              PYMECapital
+            <button className="text-2xl text-Green font-bold">
+              Logo
             </button>
-            <button className="hidden md:block font-medium hover:opacity-70 transition-opacity">
+            <button className="hidden md:block text-Green font-medium hover:text-Violet transition-colors duration-300">
               Inicio
             </button>
-            <button className="hidden md:block font-medium hover:opacity-70 transition-opacity">
+            <button className="hidden md:block text-Green font-medium hover:text-Violet transition-colors duration-300">
               Nosotros
             </button>
-            <button className="hidden md:block font-medium hover:opacity-70 transition-opacity">
+            <button className="hidden md:block text-Green font-medium hover:text-Violet transition-colors duration-300">
               Financiamiento
             </button>
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
-            <button className="px-6 py-2 font-medium hover:opacity-70 transition-opacity">
+            <button className="px-6 py-2 text-Green font-medium hover:opacity-70 transition-opacity">
               Ingresar
             </button>
-            <button className="px-6 py-2 font-medium hover:opacity-70 transition-opacity">
+            <button className="px-6 py-2 bg-Violet text-white font-medium rounded-xl hover:opacity-70 transition-opacity">
               Crear Cuenta
             </button>
           </div>
