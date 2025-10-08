@@ -8,7 +8,7 @@ export default function HomePage() {
         <img
           src="/banner.png"
           alt="Banner"
-          className="w-full h-[220px] sm:h-[280px] md:h-[340px] lg:h-[400px] object-cover"
+          className="w-full h-[220px] sm:h-[280px] md:h-[340px] lg:h-[380px] object-cover"
         />
         <div className="absolute inset-x-0 -bottom-5 flex justify-center">
           <button className="px-6 sm:px-8 py-2 sm:py-3 bg-secondary text-white font-extrabold text-3xl rounded-4xl shadow-[0px_4px_4px_rgba(0,0,0,0.25)] cursor-pointer">
@@ -39,7 +39,7 @@ export default function HomePage() {
           <h2 className="text-text font-bold text-lg">Seguí los siguientes pasos</h2>
         </div>
 
-        <div className="mt-6 sm:mt-8 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-5xl mx-auto items-start">
+        <div className="mb-16 mt-6 sm:mt-8 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-5xl mx-auto items-start">
           <div className="flex flex-col items-center gap-4">
             <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-primary text-text flex items-center justify-center text-5xl font-bold shadow-[0px_4px_4px_rgba(0,0,0,0.25)]">
               1

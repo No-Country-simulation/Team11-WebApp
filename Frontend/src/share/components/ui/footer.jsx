@@ -2,7 +2,7 @@ import { Mail, Phone } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="mt-16 bg-primary-darker text-white">
+    <footer className="bg-primary-darker text-white">
       <div className="mx-auto w-full max-w-7xl px-6 py-12 grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_1fr] gap-10">
         {/* Columna principal */}
         <div>
