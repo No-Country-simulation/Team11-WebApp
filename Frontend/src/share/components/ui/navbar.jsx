@@ -47,9 +47,9 @@ const Navbar = ({ variant = "home", user }) => {
             <div className="flex items-center space-x-6 lg:space-x-10">
               <div className="flex-1 items-center">
                 <img
-                  src="/logo.png"
+                  src="/logo.svg"
                   alt="PYFIN"
-                  className="h-22 w-auto -mt-9"
+                  className="h-18 w-auto -mt-9"
                 />
               </div>
               {links.map((link) => (
