@@ -21,11 +21,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(csrf -> csrf.disable()) // ← Desactiva CSRF
                 .authorizeHttpRequests((authorize) -> authorize
                         //  Aquí están las rutas públicas.
 
-                        .requestMatchers( "/auth/register-client",
-                                "/auth/register-operator").permitAll()
+                        .requestMatchers( "/auth/register", "/auth/operator/register").permitAll()
 
                         //  Todas las demás rutas requerirán autenticación (por ejemplo, /users, /creditos, etc.)
                         .anyRequest().authenticated()
@@ -37,7 +37,7 @@ public class SecurityConfig {
 
     //  Maneja el proceso de autenticación (login)
     // Usa el servicio que busca usuarios (UserDetailsService) y el codificador de contraseñas (PasswordEncoder)
-    @Bean
+    /*@Bean
     public AuthenticationManager authenticationManager(
             UserDetailsService userDetailsService,
             PasswordEncoder passwordEncoder) {
@@ -49,7 +49,7 @@ public class SecurityConfig {
 
         // 🔁 El ProviderManager coordina la autenticación con los proveedores configurados
         return new ProviderManager(authenticationProvider);
-    }
+    }*/
 
     //para hacer login
     /* @Bean

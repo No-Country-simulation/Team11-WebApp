@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 public class UserRequestDto {
 
-    // getters y setters
+
     @NotNull
     @NotEmpty
     private String name;
