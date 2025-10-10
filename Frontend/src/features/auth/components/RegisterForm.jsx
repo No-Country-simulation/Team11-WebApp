@@ -1,22 +1,86 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 
 const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', null
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  const { register, handleSubmit, watch, formState: { errors }, reset } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    setSubmitStatus(null);
+
+    try {
+      // Preparar los datos para enviar al backend
+      const userData = {
+        name: data.fullName.split(' ')[0], // Primer nombre
+        lastname: data.fullName.split(' ').slice(1).join(' '), // Apellidos
+        email: data.email,
+        password: data.password, // El backend se encargará del hash
+        dni: data.dni,
+        rol: 'CLIENT' // Por defecto es cliente
+      };
+
+      {/* Gaston: Aqui se maneja peticion, cuando este listo el back lo actualizamos */}
+      const response = await fetch('http://localhost:5173/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData)
+      });
+
+      if (!response.ok) {
+        // Si el servidor responde con error (400, 500, etc.)
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al registrar usuario');
+      }
+
+      const result = await response.json();
+      console.log('Usuario registrado exitosamente:', result);
+      
+      setSubmitStatus('success');
+      reset(); // Limpiar el formulario
+      
+      // Opcional: Redirigir después de 2 segundos
+      setTimeout(() => {
+        // window.location.href = '/login';
+        console.log('Redirigir a login...');
+      }, 2000);
+
+    } catch (error) {
+      console.error('Error:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const password = watch('password');
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-OffGreen rounded-sm shadow-md">
+    <div className="max-w-2xl mx-auto p-6 bg-Green rounded-sm shadow-md">
       <h2 className="text-3xl font-bold text-white mb-6">Crea tu cuenta</h2>
+
+      {/* Mensaje de éxito */}
+      {submitStatus === 'success' && (
+        <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded flex items-center gap-2">
+          <CheckCircle className="h-5 w-5" />
+          <span>¡Cuenta creada exitosamente! Redirigiendo...</span>
+        </div>
+      )}
+
+      {/* Mensaje de error */}
+      {submitStatus === 'error' && (
+        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded flex items-center gap-2">
+          <AlertCircle className="h-5 w-5" />
+          <span>Error al crear la cuenta. Por favor intenta nuevamente.</span>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
@@ -28,9 +92,10 @@ const RegisterForm = () => {
             type="text"
             {...register('fullName', { required: 'Este campo es requerido' })}
             className="w-full px-4 py-2 border-1 bg-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
+            disabled={isLoading}
           />
           {errors.fullName && (
-            <span className="text-red-500 text-sm">{errors.fullName.message}</span>
+            <span className="text-red-300 text-sm">{errors.fullName.message}</span>
           )}
         </div>
 
@@ -49,9 +114,10 @@ const RegisterForm = () => {
               }
             })}
             className="w-full px-4 py-2 border-1 bg-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
+            disabled={isLoading}
           />
           {errors.dni && (
-            <span className="text-red-500 text-sm">{errors.dni.message}</span>
+            <span className="text-red-300 text-sm">{errors.dni.message}</span>
           )}
         </div>
 
@@ -70,9 +136,10 @@ const RegisterForm = () => {
               }
             })}
             className="w-full px-4 py-2 border-1 bg-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
+            disabled={isLoading}
           />
           {errors.email && (
-            <span className="text-red-500 text-sm">{errors.email.message}</span>
+            <span className="text-red-300 text-sm">{errors.email.message}</span>
           )}
         </div>
 
@@ -89,9 +156,10 @@ const RegisterForm = () => {
                 value === watch('email') || 'Los correos electrónicos no coinciden'
             })}
             className="w-full px-4 py-2 border-1 bg-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
+            disabled={isLoading}
           />
           {errors.repeatEmail && (
-            <span className="text-red-500 text-sm">{errors.repeatEmail.message}</span>
+            <span className="text-red-300 text-sm">{errors.repeatEmail.message}</span>
           )}
         </div>
 
@@ -111,17 +179,19 @@ const RegisterForm = () => {
                 }
               })}
               className="w-full px-4 py-2 border-1 bg-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 pr-10"
+              disabled={isLoading}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2"
+              disabled={isLoading}
             >
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
           {errors.password && (
-            <span className="text-red-500 text-sm">{errors.password.message}</span>
+            <span className="text-red-300 text-sm">{errors.password.message}</span>
           )}
         </div>
 
@@ -143,17 +213,19 @@ const RegisterForm = () => {
                   value === password || 'Las contraseñas no coinciden'
               })}
               className="w-full px-4 py-2 border-1 bg-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 pr-10"
+              disabled={isLoading}
             />
             <button
               type="button"
               onClick={() => setShowRepeatPassword(!showRepeatPassword)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2"
+              disabled={isLoading}
             >
               {showRepeatPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
           {errors.repeatPassword && (
-            <span className="text-red-500 text-sm">{errors.repeatPassword.message}</span>
+            <span className="text-red-300 text-sm">{errors.repeatPassword.message}</span>
           )}
         </div>
 
@@ -167,27 +239,30 @@ const RegisterForm = () => {
               required: 'Debes aceptar los términos y condiciones'
             })}
             className="h-4 w-4 mr-2 border-2 border-black"
+            disabled={isLoading}
           />
-          <label htmlFor="termsAccepted " className="text-sm text-white">
+          <label htmlFor="termsAccepted" className="text-sm text-white">
             He leído y acepto los <a href="#" className="underline">Términos y condiciones</a>
           </label>
         </div>
         {errors.termsAccepted && (
-          <span className="text-red-500 text-sm block">{errors.termsAccepted.message}</span>
+          <span className="text-red-300 text-sm block">{errors.termsAccepted.message}</span>
         )}
 
         <div className="flex justify-between pt-4">
           <button
             type="button"
             className="px-6 py-2 border-0 rounded-lg text-white cursor-pointer font-medium hover:text-Violet transition-colors duration-400"
+            disabled={isLoading}
           >
             Cancelar
           </button>
           <button
             type="submit"
-            className="px-6 py-2 bg-Violet text-white cursor-pointer rounded-sm font-medium hover:bg-DarkViolet transition-colors duration-400"
+            className="px-6 py-2 bg-Violet text-white cursor-pointer rounded-sm font-medium hover:bg-purple-800 transition-colors duration-400"
+            disabled={isLoading}
           >
-            Crear Cuenta
+            {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
           </button>
         </div>
       </form>
