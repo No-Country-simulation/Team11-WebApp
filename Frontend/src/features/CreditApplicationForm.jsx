@@ -35,12 +35,12 @@ const CreditApplicationForm = () => {
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-3xl font-bold mb-6">Formulario Para Solicitar Crédito</h1>
+      <h1 className="text-3xl  text-Green font-bold mb-6">Formulario Para Solicitar Crédito</h1>
 
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <FileText className="h-6 w-6" />
-          <h2 className="text-xl font-semibold">
+          <FileText className="h-6 w-6  text-Green" />
+          <h2 className="text-xl text-Green font-semibold">
             Paso {currentStep} de 4: {getStepTitle()}
           </h2>
         </div>
@@ -51,13 +51,13 @@ const CreditApplicationForm = () => {
         {currentStep === 1 && (
           <>
             <div>
-              <label htmlFor="creditType" className="block font-medium mb-2">
+              <label htmlFor="creditType" className="block text-Green font-medium mb-2">
                 Tipo de Crédito *
               </label>
               <select
                 id="creditType"
                 {...register('creditType', { required: 'Este campo es obligatorio' })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               >
                 <option value="">Seleccione una opción</option>
                 <option value="proximamente1">Próximamente</option>
@@ -70,14 +70,14 @@ const CreditApplicationForm = () => {
             </div>
 
             <div>
-              <label htmlFor="requestedAmount" className="block font-medium mb-2">
+              <label htmlFor="requestedAmount" className="block  text-Green font-medium mb-2">
                 Monto solicitado *
               </label>
               <input
                 id="requestedAmount"
                 type="text"
                 {...register('requestedAmount', { required: 'Este campo es obligatorio' })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 border  text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
               {errors.requestedAmount && (
                 <span className="text-red-500 text-sm block">{errors.requestedAmount.message}</span>
@@ -86,7 +86,7 @@ const CreditApplicationForm = () => {
             </div>
 
             <div>
-              <label htmlFor="financingTerm" className="block font-medium mb-2">
+              <label htmlFor="financingTerm" className="block  text-Green font-medium mb-2">
                 Plazo deseado de financiación *
               </label>
               <input
@@ -102,18 +102,18 @@ const CreditApplicationForm = () => {
             </div>
 
             <div>
-              <label htmlFor="creditPurpose" className="block font-medium mb-2">
+              <label htmlFor="creditPurpose" className="block  text-Green font-medium mb-2">
                 Destino del crédito *
               </label>
               <select
                 id="creditPurpose"
                 {...register('creditPurpose', { required: 'Este campo es obligatorio' })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 border  text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               >
                 <option value="">Seleccione una opción</option>
-                <option value="proximamente1">Próximamente</option>
-                <option value="proximamente2">Próximamente</option>
-                <option value="proximamente3">Próximamente</option>
+                <option value="proximamente1" className=' text-Green'>Próximamente</option>
+                <option value="proximamente2" className=' text-Green'>Próximamente</option>
+                <option value="proximamente3" className=' text-Green'>Próximamente</option>
               </select>
               {errors.creditPurpose && (
                 <span className="text-red-500 text-sm">{errors.creditPurpose.message}</span>
@@ -121,7 +121,7 @@ const CreditApplicationForm = () => {
             </div>
 
             <div>
-              <label htmlFor="estimatedDate" className="block font-medium mb-2">
+              <label htmlFor="estimatedDate" className="block  text-Green font-medium mb-2">
                 Fecha estimada en que se necesita el crédito (opcional)
               </label>
               <input
@@ -138,7 +138,7 @@ const CreditApplicationForm = () => {
         {currentStep === 2 && (
           <>
             <div>
-              <label htmlFor="monthlyRevenue" className="block font-medium mb-2">
+              <label htmlFor="monthlyRevenue" className="block  text-Green font-medium mb-2">
                 Facturación mensual promedio *
               </label>
               <input
@@ -151,11 +151,11 @@ const CreditApplicationForm = () => {
               {errors.monthlyRevenue && (
                 <span className="text-red-500 text-sm block">{errors.monthlyRevenue.message}</span>
               )}
-              <p className="text-sm text-gray-600 mt-1">Ejemplo: $ 40000000</p>
+              <p className="text-sm  text-Green mt-1">Ejemplo: $ 40000000</p>
             </div>
 
             <div>
-              <label htmlFor="monthlyExpenses" className="block font-medium mb-2">
+              <label htmlFor="monthlyExpenses" className="block  text-Green font-medium mb-2">
                 Gasto Mensual Promedio *
               </label>
               <input
@@ -172,7 +172,7 @@ const CreditApplicationForm = () => {
             </div>
 
             <div>
-              <label htmlFor="documents" className="block font-medium mb-2">
+              <label htmlFor="documents" className="block  text-Green font-medium mb-2">
                 Adjuntar Documentación * (Balance General, Estado de Resultados, DDJJ IVA o IIBB, etc.)
               </label>
               <input
@@ -197,19 +197,19 @@ const CreditApplicationForm = () => {
         {currentStep === 3 && (
           <>
             <div>
-              <label htmlFor="creditType" className="block font-medium mb-2">
+              <label htmlFor="creditType" className="block text-Green font-medium mb-2">
                 Tipo de crédito *
               </label>
               <select
                 id="creditType"
                 defaultValue={formData.creditType || ''}
                 {...register('creditType', { required: 'Este campo es obligatorio' })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               >
                 <option value="">Seleccione una opción</option>
-                <option value="proximamente1">Próximamente</option>
-                <option value="proximamente2">Próximamente</option>
-                <option value="proximamente3">Próximamente</option>
+                <option value="proximamente1" className=' text-Green'>Próximamente</option>
+                <option value="proximamente2" className=' text-Green'>Próximamente</option>
+                <option value="proximamente3" className=' text-Green'>Próximamente</option>
               </select>
               {errors.creditType && (
                 <span className="text-red-500 text-sm">{errors.creditType.message}</span>
@@ -217,7 +217,7 @@ const CreditApplicationForm = () => {
             </div>
 
             <div>
-              <label htmlFor="requestedAmount" className="block font-medium mb-2">
+              <label htmlFor="requestedAmount" className="block text-Green font-medium mb-2">
                 Monto solicitado *
               </label>
               <input
@@ -225,7 +225,7 @@ const CreditApplicationForm = () => {
                 type="text"
                 defaultValue={formData.requestedAmount || ''}
                 {...register('requestedAmount', { required: 'Este campo es obligatorio' })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
               {errors.requestedAmount && (
                 <span className="text-red-500 text-sm block">{errors.requestedAmount.message}</span>
@@ -233,7 +233,7 @@ const CreditApplicationForm = () => {
             </div>
 
             <div>
-              <label htmlFor="financingTerm" className="block font-medium mb-2">
+              <label htmlFor="financingTerm" className="block text-Green font-medium mb-2">
                 Plazo deseado de financiación *
               </label>
               <input
@@ -241,7 +241,7 @@ const CreditApplicationForm = () => {
                 type="text"
                 defaultValue={formData.financingTerm || ''}
                 {...register('financingTerm', { required: 'Este campo es obligatorio' })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
               {errors.financingTerm && (
                 <span className="text-red-500 text-sm block">{errors.financingTerm.message}</span>
@@ -249,7 +249,7 @@ const CreditApplicationForm = () => {
             </div>
 
             <div>
-              <label htmlFor="creditPurpose" className="block font-medium mb-2">
+              <label htmlFor="creditPurpose" className="block text-Green font-medium mb-2">
                 Destino del crédito *
               </label>
               <input
@@ -387,7 +387,7 @@ const CreditApplicationForm = () => {
           {currentStep === 1 ? (
             <button
               type="button"
-              className="px-6 py-2 border rounded-lg font-medium hover:bg-gray-50 transition-colors"
+              className="px-6 py-2 border-0 text-Green rounded-lg font-medium hover:bg-gray-50 transition-colors"
             >
               Cancelar
             </button>
@@ -395,15 +395,15 @@ const CreditApplicationForm = () => {
             <button
               type="button"
               onClick={handleBack}
-              className="px-6 py-2 border rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+              className="px-6 py-2 border-0 rounded-lg text-Green font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-5 w-5 text-Green" />
               Atrás
             </button>
           )}
           <button
             type="submit"
-            className="px-6 py-2 bg-black text-white rounded-lg font-medium hover:opacity-80 transition-opacity"
+            className="px-6 py-2 bg-Violet text-white rounded-lg font-medium hover:opacity-80 transition-opacity"
           >
             {currentStep === 3 ? 'Enviar Solicitud' : currentStep === 4 ? 'Confirmar y finalizar' : 'Guardar y Continuar'}
           </button>
