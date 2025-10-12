@@ -22,4 +22,27 @@ public class GlobalExceptionHandler {
 		);
 		return new ResponseEntity<>(errorResponse,HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-}
+	
+	//Manejo de BadRequestException
+	@ExceptionHandler(BadRequestException.class)
+	public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex, HttpServletRequest request) {
+		ErrorResponse errorResponse = new ErrorResponse(
+				HttpStatus.BAD_REQUEST.value(), 
+				HttpStatus.BAD_REQUEST.getReasonPhrase(), 
+				ex.getMessage(), 
+				request.getRequestURI()
+		);
+		return new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);		
+	}
+	
+	//Manejo genérico para cualquier excepción no controladaa
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, HttpServletRequest request) {
+		ErrorResponse errorResponse = new ErrorResponse(
+				HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+				HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), 
+				ex.getMessage(), 
+				request.getRequestURI()
+		);
+		return new ResponseEntity<>(errorResponse,HttpStatus.INTERNAL_SERVER_ERROR);
+	}
