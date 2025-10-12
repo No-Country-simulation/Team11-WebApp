@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
 				ex.getMessage(), 
 				request.getRequestURI()
 		);
-		return new ResponseEntity<>(errorResponse,HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
 	}
 	
 	//Manejo de BadRequestException
