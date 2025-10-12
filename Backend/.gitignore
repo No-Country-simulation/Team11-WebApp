@@ -18,6 +18,8 @@ target/
 *.iws
 *.iml
 *.ipr
+**/.env
+.env.example
 
 ### NetBeans ###
 /nbproject/private/
@@ -32,6 +34,6 @@ build/
 ### VS Code ###
 .vscode/
 # Environment variables
-.env
+.env.properties
 *.env
 !.env.example
