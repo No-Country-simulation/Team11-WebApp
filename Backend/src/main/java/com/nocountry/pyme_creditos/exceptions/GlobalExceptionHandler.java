@@ -35,6 +35,30 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);		
 	}
 	
+	//Manejo de ConflictEXception
+	@ExceptionHandler(ConflictException.class)
+	public ResponseEntity<ErrorResponse> handleConflictException(ConflictException ex, HttpServletRequest request) {
+		ErrorResponse errorResponse = new ErrorResponse(
+				HttpStatus.CONFLICT.value(),
+				HttpStatus.CONFLICT.getReasonPhrase(),
+				ex.getMessage(),
+				request.getRequestURI()
+		);
+		return new ResponseEntity<>(errorResponse,HttpStatus.CONFLICT);
+	}
+	
+	//Manejo de UnauthorizedException
+	@ExceptionHandler(UnauthorizedException.class)
+	public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException ex, HttpServletRequest request) {
+		ErrorResponse errorResponse = new ErrorResponse(
+				HttpStatus.UNAUTHORIZED.value(),
+				HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+				ex.getMessage(),
+				request.getRequestURI()
+		);
+		return new ResponseEntity<>(errorResponse,HttpStatus.UNAUTHORIZED);
+	}
+	
 	//Manejo genérico para cualquier excepción no controladaa
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, HttpServletRequest request) {
