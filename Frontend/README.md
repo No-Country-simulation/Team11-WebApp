@@ -60,3 +60,43 @@ npm run build    # Build de producción
 npm run preview  # Previsualización del build
 npm run lint     # Linter
 ```
+
+### Uso del cliente HTTP compartido (`api` con axios)
+
+La app expone una instancia compartida de axios en `src/share/api/api.js` para centralizar la configuración (baseURL, interceptores, etc.).
+
+1) Configurar la variable de entorno del backend en `.env` (o `.env.local`):
+
+```bash
+VITE_API_BASE=https://backend.dev/
+```
+
+2) Importar y usar `api` en los servicios o componentes (preferiblemente en `services/` de cada feature):
+
+```js
+// Ejemplos de uso
+import { api } from "../share/api/api";
+
+// GET
+const { data } = await api.get("/users");
+
+// POST (con payload)
+await api.post("/auth/login", { email, password });
+
+// Con params y headers adicionales (si hace falta)
+await api.get("/reports", { params: { page: 1 }, headers: { "x-source": "web" } });
+```
+
+3) Manejo de errores: `api` devuelve los errores de axios. Se puede capturar en los servicios para mapear mensajes de UI.
+
+```js
+try {
+  const { data } = await api.get("/me");
+  return data;
+} catch (error) {
+  const message = error?.response?.data?.message ?? "Error inesperado";
+  throw new Error(message);
+}
+```
+
+Nota: Próximamente se agregará en `api.js` la inyección automática del token (p. ej., `Authorization: Bearer <token>`) mediante interceptores. De esa manera, no sera necesario pasar el token manualmente en cada request.
