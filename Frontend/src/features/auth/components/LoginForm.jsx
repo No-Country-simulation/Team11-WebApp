@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Mail, Eye, EyeOff } from 'lucide-react';
 
-const LoginForm = () => {
+const LoginForm = ( {onClose} ) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState(false);
 
@@ -86,6 +86,7 @@ const LoginForm = () => {
         <div className="flex justify-between pt-4">
           <button
             type="button"
+            onClick={onClose}
             className="px-6 py-2 border-0 cursor-pointer text-white font-medium hover:text-LightViolet transition-colors duration-300"
           >
             Cancelar

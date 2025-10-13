@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 
-const RegisterForm = () => {
+const RegisterForm = ( {onClose} ) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -252,6 +252,7 @@ const RegisterForm = () => {
         <div className="flex justify-between pt-4">
           <button
             type="button"
+            onClick={onClose}
             className="px-6 py-2 border-0 rounded-lg text-white cursor-pointer font-medium hover:text-Violet transition-colors duration-400"
             disabled={isLoading}
           >

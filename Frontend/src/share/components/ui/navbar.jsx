@@ -205,7 +205,7 @@ const Navbar = ({ variant = "home", user }) => {
             className="max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
-            <Login />
+            <Login onClose={handleCloseModals} />
           </div>
         </div>
       )}
@@ -220,7 +220,7 @@ const Navbar = ({ variant = "home", user }) => {
             className="max-w-2xl w-full max-h-screen overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <Register />
+            <Register onClose={handleCloseModals} />
           </div>
         </div>
       )}
