@@ -1,61 +1,76 @@
 package com.nocountry.pyme_creditos.config;
 
 
+import com.nocountry.pyme_creditos.security.JwtAuthenticationEntryPoint;
+import com.nocountry.pyme_creditos.security.JwtRequestFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
 
+    @Autowired
+    private JwtRequestFilter jwtRequestFilter; // @Component
+
+    @Autowired
+    private JwtAuthenticationEntryPoint entryPoint; // @Component
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // ← Desactiva CSRF
-                .authorizeHttpRequests((authorize) -> authorize
-                        //  Aquí están las rutas públicas.
+                // API stateless (sin cookies csrf)
+                .csrf(csrf -> csrf.disable())
 
-                        .requestMatchers( "/auth/register", "/auth/operator/register").permitAll()
+                // Respuestas 401 en JSON desde nuestro entry point
+                .exceptionHandling(e -> e.authenticationEntryPoint(entryPoint))
 
-                        //  Todas las demás rutas requerirán autenticación (por ejemplo, /users, /creditos, etc.)
+                // Sin sesiones en servidor
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // Autorización por rutas
+                .authorizeHttpRequests(auth -> auth
+                        // públicas
+                        .requestMatchers(
+                                "/auth/login",
+                                "/auth/register",
+                                "/auth/operator/register",
+                                "/auth/.well-known/jwks.json"
+                        ).permitAll()
+
+                        // ej. por rol (opcional, si es que lo vamos a usar)
+                        .requestMatchers("/operator/**").hasRole("OPERATOR")
+                        .requestMatchers("/client/**").hasRole("CLIENT")
+
+                        // el resto, autenticado
                         .anyRequest().authenticated()
                 );
 
-        //  Construye la configuración final de seguridad
+        // Inyectar el filtro JWT antes del filtro de username/password
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
-    //  Maneja el proceso de autenticación (login)
-    // Usa el servicio que busca usuarios (UserDetailsService) y el codificador de contraseñas (PasswordEncoder)
-    /*@Bean
-    public AuthenticationManager authenticationManager(
-            UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder) {
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
 
-        //  Este proveedor verifica usuario + contraseña usando tu implementación de UserDetailsService
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder);
-
-        // 🔁 El ProviderManager coordina la autenticación con los proveedores configurados
-        return new ProviderManager(authenticationProvider);
-    }*/
-
-    //para hacer login
-    /* @Bean
-    public UserDetailsService userDetailsService(UserService userService) {
-        return userService; // Spring Security usará tu implementación real
-    }*/
 
     // Define cómo se van a cifrar las contraseñas
     @Bean
