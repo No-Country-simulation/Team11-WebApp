@@ -311,13 +311,15 @@ const CreditApplicationForm = () => {
 
             <div>
               <label htmlFor="documents" className="block font-medium mb-2">
-                Adjuntar documentación * (Balance General, Estado de Resultados, DDJJ IVA o IIBB, etc.)
+                Adjuntar documentación {!formData.documents && '*'} (Balance General, Estado de Resultados, DDJJ IVA o IIBB, etc.)
               </label>
               <input
                 id="documents"
                 type="file"
                 accept=".pdf"
-                {...register('documents', { required: 'Este campo es obligatorio' })}
+                {...register('documents', { 
+                  required: !formData.documents ? 'Este campo es obligatorio' : false 
+                })}
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
               {errors.documents && (
