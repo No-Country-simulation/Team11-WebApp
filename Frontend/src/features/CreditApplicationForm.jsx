@@ -59,10 +59,11 @@ const CreditApplicationForm = () => {
                 {...register('creditType', { required: 'Este campo es obligatorio' })}
                 className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               >
-                <option value="">Seleccione una opción</option>
-                <option value="proximamente1">Próximamente</option>
-                <option value="proximamente2">Próximamente</option>
-                <option value="proximamente3">Próximamente</option>
+                <option value="" className='text-Green'>Seleccione una opción</option>
+                <option value="Capital de Trabajo" className='text-Green'>Capital de Trabajo</option>
+                <option value="Inversión" className='text-Green'>Inversión</option>
+                <option value="Equipamiento" className='text-Green'>Equipamiento</option>
+                <option value="Otro" className='text-Green'>Otro</option>
               </select>
               {errors.creditType && (
                 <span className="text-red-500 text-sm">{errors.creditType.message}</span>
@@ -111,9 +112,10 @@ const CreditApplicationForm = () => {
                 className="w-full px-4 py-2 border  text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               >
                 <option value="">Seleccione una opción</option>
-                <option value="proximamente1" className=' text-Green'>Próximamente</option>
-                <option value="proximamente2" className=' text-Green'>Próximamente</option>
-                <option value="proximamente3" className=' text-Green'>Próximamente</option>
+                <option value="Compra de insumos" className=' text-Green'>Compra de insumos</option>
+                <option value="Pago a proveedores" className=' text-Green'>Pago a proveedores</option>
+                <option value="Expansión" className=' text-Green'>Expansión</option>
+                <option value="Otro" className=' text-Green'>Otro</option>
               </select>
               {errors.creditPurpose && (
                 <span className="text-red-500 text-sm">{errors.creditPurpose.message}</span>
@@ -206,10 +208,11 @@ const CreditApplicationForm = () => {
                 {...register('creditType', { required: 'Este campo es obligatorio' })}
                 className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               >
-                <option value="">Seleccione una opción</option>
-                <option value="proximamente1" className=' text-Green'>Próximamente</option>
-                <option value="proximamente2" className=' text-Green'>Próximamente</option>
-                <option value="proximamente3" className=' text-Green'>Próximamente</option>
+                <option value="" className='text-Green'>Seleccione una opción</option>
+                <option value="Capital de Trabajo" className='text-Green'>Capital de Trabajo</option>
+                <option value="Inversión" className='text-Green'>Inversión</option>
+                <option value="Equipamiento" className='text-Green'>Equipamiento</option>
+                <option value="Otro" className='text-Green'>Otro</option>
               </select>
               {errors.creditType && (
                 <span className="text-red-500 text-sm">{errors.creditType.message}</span>
