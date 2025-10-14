@@ -1,4 +1,4 @@
 package com.nocountry.pyme_creditos.enums;
 
-public class KYCProvider {
+public enum KYCProvider {
 }

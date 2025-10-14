@@ -1,6 +1,6 @@
 package com.nocountry.pyme_creditos.enums;
 
-public class UserRole {
+public enum  UserRole {
 
 
 }

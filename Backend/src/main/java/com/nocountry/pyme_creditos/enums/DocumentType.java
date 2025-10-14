@@ -1,5 +1,5 @@
 package com.nocountry.pyme_creditos.enums;
 
-public class DocumentType {
+public enum DocumentType {
 
 }
