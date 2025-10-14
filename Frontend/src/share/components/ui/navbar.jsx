@@ -16,14 +16,14 @@ const Navbar = ({ variant = "home", user }) => {
   ];
 
   const pymeLinks = [
-    { to: "/panel", label: "Inicio" },
+    { to: "/panel", label: "Inicio", end: true },
     { to: "/panel/mis-solicitudes", label: "Mis solicitudes" },
     { to: "/panel/documentacion", label: "Documentación" },
     { to: "/panel/historial-credito", label: "Historial de crédito" },
   ];
 
   const operatorLinks = [
-    { to: "/operador/panel", label: "Inicio" },
+    { to: "/operador/panel", label: "Inicio", end: true },
     {
       to: "/operador/panel/gestion-solicitudes",
       label: "Gestión de solicitudes",
@@ -78,7 +78,7 @@ const Navbar = ({ variant = "home", user }) => {
                   <NavLink
                     key={link.to}
                     to={link.to}
-                    end
+                    end={link.end}
                     className={({ isActive }) =>
                       `hidden lg:block font-bold text-xl transition-colors duration-300 ${
                         isActive
@@ -94,14 +94,14 @@ const Navbar = ({ variant = "home", user }) => {
 
               {variant === "home" ? (
                 <div className="hidden lg:flex items-center space-x-4">
-                  <button 
+                  <button
                     onClick={handleOpenLogin}
                     className="px-4 py-2 text-text font-medium cursor-pointer inline-flex items-center gap-2"
                   >
                     <CircleUser className="h-5 w-5 text-Violet" />
                     Ingresar
                   </button>
-                  <button 
+                  <button
                     onClick={handleOpenRegister}
                     className="px-6 py-2 bg-Violet text-white font-semibold rounded-full shadow-sm cursor-pointer"
                   >
@@ -160,14 +160,14 @@ const Navbar = ({ variant = "home", user }) => {
                 ))}
                 {variant === "home" ? (
                   <>
-                    <button 
+                    <button
                       onClick={handleOpenLogin}
                       className="w-full text-left px-3 py-2 text-text font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
                     >
                       <CircleUser className="h-5 w-5 text-Violet" />
                       Ingresar
                     </button>
-                    <button 
+                    <button
                       onClick={handleOpenRegister}
                       className="block w-full max-w-md text-left px-3 py-2 bg-Violet text-white font-medium rounded-full hover:opacity-90 transition-opacity"
                     >
@@ -197,7 +197,7 @@ const Navbar = ({ variant = "home", user }) => {
 
       {/* Modal Login */}
       {showLogin && (
-        <div 
+        <div
           className="fixed inset-0 flex items-center justify-end z-50 p-4"
           onClick={handleCloseModals}
         >
@@ -212,11 +212,11 @@ const Navbar = ({ variant = "home", user }) => {
 
       {/* Modal Register */}
       {showRegister && (
-        <div 
+        <div
           className="fixed inset-0 bg-alt-transparent flex items-center justify-center z-50 p-4"
           onClick={handleCloseModals}
         >
-          <div 
+          <div
             className="max-w-2xl w-full max-h-screen overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
