@@ -130,7 +130,7 @@ public class CompanyService {
         return new CompanyResponseDTO(updatedCompany);
     }
 
-    /*/ ✅ DELETE - Eliminar empresa (CORREGIDO: UUID)
+    // ✅ DELETE - Eliminar empresa (CORREGIDO: UUID)
     public void deleteCompany(UUID companyId, UUID userId) {
         log.info("Eliminando empresa con ID: {}", companyId);
 
@@ -149,7 +149,7 @@ public class CompanyService {
 
         companyRepository.delete(company);
         log.info("Empresa {} eliminada exitosamente", companyId);
-    }*/
+    }
 
     // ✅ Métodos de búsqueda
     @Transactional(readOnly = true)

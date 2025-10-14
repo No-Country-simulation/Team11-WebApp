@@ -67,7 +67,7 @@ public class CompanyController {
         return ResponseEntity.ok(response);
     }
 
-    /*/ ✅ DELETE - Eliminar empresa (CORREGIDO a UUID)
+    // ✅ DELETE - Eliminar empresa (CORREGIDO a UUID)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCompany(
             @PathVariable UUID id,
@@ -75,7 +75,7 @@ public class CompanyController {
 
         companyService.deleteCompany(id, userId);
         return ResponseEntity.noContent().build();
-    }*/
+    }
 
     // ✅ GET - Buscar empresas por sector
     @GetMapping("/search/sector")

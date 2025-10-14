@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -57,6 +58,10 @@ public class Company {
 
     @Column(name = "company_years", nullable = false)
     private Integer companyYears;
+
+    @OneToMany(mappedBy = "company",  cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
+    private Set<CreditApplication> creditApplications;
 
     // Auditoría
     @Column(name = "created_at")
