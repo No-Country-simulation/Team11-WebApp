@@ -5,7 +5,10 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
@@ -18,6 +21,7 @@ import java.util.Date;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class JwtUtilRsa {
 
     @Value("${jwt.private-key-path}")
@@ -29,13 +33,17 @@ public class JwtUtilRsa {
     @Value("${jwt.expiration-minutes}")
     private Long expirationMinutes;
 
+    private final ResourceLoader resourceLoader;
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
     @PostConstruct
     public void initKeys() throws Exception {
-        byte[] privateBytes = Files.readAllBytes(Paths.get(privateKeyPath));
-        byte[] publicBytes = Files.readAllBytes(Paths.get(publicKeyPath));
+        Resource privateResource = resourceLoader.getResource("classpath:keys/private_key.pem");
+        Resource publicResource = resourceLoader.getResource("classpath:keys/public_key.pem");
+
+        byte[] privateBytes = privateResource.getInputStream().readAllBytes();
+        byte[] publicBytes = publicResource.getInputStream().readAllBytes();
 
         String privateContent = new String(privateBytes)
                 .replaceAll("-----BEGIN (.*)-----", "")
