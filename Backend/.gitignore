@@ -37,3 +37,4 @@ build/
 .env.properties
 *.env
 !.env.example
+src/main/resources/application.properties
