@@ -3,7 +3,7 @@ package com.nocountry.pyme_creditos.controller;
 import com.nocountry.pyme_creditos.dto.CompanyRequestDTO;
 import com.nocountry.pyme_creditos.dto.CompanyResponseDTO;
 import com.nocountry.pyme_creditos.dto.CompanyUpdateDTO;
-import com.nocountry.pyme_creditos.service.CompanyService;
+import com.nocountry.pyme_creditos.services.CompanyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
