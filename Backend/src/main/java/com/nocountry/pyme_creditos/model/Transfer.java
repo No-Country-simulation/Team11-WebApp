@@ -45,7 +45,7 @@ public class Transfer {
 	@Column(name = "transfer_status", nullable = false)
 	private TransferStatus transferStatus = TransferStatus.PENDING;
 	
-	@Column(name = "transfer_receipt_url", nullable = false, length = 255)
+	@Column(name = "transfer_receipt_url", length = 255)
 	private String transferReceiptUrl;
 	
 	//Fechas
@@ -55,6 +55,6 @@ public class Transfer {
 	@Column(name = "processed_at")
 	private LocalDateTime processedAt;
 	
-	@Column(name = "authorization_code", nullable = false, length = 100)
+	@Column(name = "authorization_code", length = 100)
 	private String authorizationCode;
 }
