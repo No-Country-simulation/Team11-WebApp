@@ -1,4 +1,4 @@
-package com.nocountry.pyme_creditos.service;
+package com.nocountry.pyme_creditos.services;
 
 import com.nocountry.pyme_creditos.dto.CompanyRequestDTO;
 import com.nocountry.pyme_creditos.dto.CompanyResponseDTO;
