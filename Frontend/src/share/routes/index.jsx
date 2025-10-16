@@ -18,38 +18,65 @@ import PymeHomePage from "../../features/pyme/pages/PymeHomePage";
 import PymeDocumentationPage from "../../features/pyme/pages/PymeDocumentationPage";
 import PymeCreditHistoryPage from "../../features/pyme/pages/PymeCreditHistoryPage";
 import OperatorRequestsManagePage from "../../features/operator/pages/OperatorRequestsManagePage";
+import { ProtectedRoute } from "./ProtectedRoute";
 
 export default function AppRoutes() {
   return (
     <Routes>
+      {/* --- Rutas públicas --- */}
       <Route element={<HomeLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/nosotros" element={<AboutUsPage />} />
         <Route path="/financiamiento" element={<FinancingPage />} />
       </Route>
 
-      <Route path="/panel" element={<PymeLayout />}>
-        <Route index element={<PymeHomePage />} />
-        <Route path="mis-solicitudes" element={<OperatorRequestsLayout />}>
-          <Route index element={<Navigate to="pendientes" replace />} />
-          <Route path="pendientes" element={<OperatorRequestsInReviewPage />} />
-          <Route path="aprobadas" element={<OperatorRequestsApprovedPage />} />
-          <Route path="rechazadas" element={<OperatorRequestsRejectedPage />} />
-          <Route path="guardadas" element={<OperatorRequestsSavedPage />} />
+      {/* --- Panel PYME (solo CLIENT) --- */}
+      <Route element={<ProtectedRoute allowedRoles={["CLIENT"]} />}>
+        <Route path="/panel" element={<PymeLayout />}>
+          <Route index element={<PymeHomePage />} />
+          <Route path="mis-solicitudes" element={<OperatorRequestsLayout />}>
+            <Route index element={<Navigate to="pendientes" replace />} />
+            <Route
+              path="pendientes"
+              element={<OperatorRequestsInReviewPage />}
+            />
+            <Route
+              path="aprobadas"
+              element={<OperatorRequestsApprovedPage />}
+            />
+            <Route
+              path="rechazadas"
+              element={<OperatorRequestsRejectedPage />}
+            />
+            <Route path="guardadas" element={<OperatorRequestsSavedPage />} />
+          </Route>
+          <Route path="documentacion" element={<PymeDocumentationPage />} />
+          <Route path="historial-credito" element={<PymeCreditHistoryPage />} />
         </Route>
-        <Route path="documentacion" element={<PymeDocumentationPage />} />
-        <Route path="historial-credito" element={<PymeCreditHistoryPage />} />
       </Route>
 
-      <Route path="/operador/panel" element={<OperatorLayout />}>
-        <Route index element={<OperatorHomePage />} />
-        <Route path="gestion-solicitudes" element={<OperatorRequestsManagePage />}/>
-        <Route path="reportes" element={<OperatorReportsPage />} />
-        <Route
-          path="historial-solicitudes"
-          element={<OperatorRequestsHistoryPage />}
-        />
+      {/* --- Panel OPERADOR (OPERATOR) --- */}
+      <Route
+        element={
+          <ProtectedRoute allowedRoles={["OPERATOR"]} />
+        }
+      >
+        <Route path="/operador/panel" element={<OperatorLayout />}>
+          <Route index element={<OperatorHomePage />} />
+          <Route
+            path="gestion-solicitudes"
+            element={<OperatorRequestsManagePage />}
+          />
+          <Route path="reportes" element={<OperatorReportsPage />} />
+          <Route
+            path="historial-solicitudes"
+            element={<OperatorRequestsHistoryPage />}
+          />
+        </Route>
       </Route>
+
+      {/* --- Si no hay match, redirigir al inicio --- */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

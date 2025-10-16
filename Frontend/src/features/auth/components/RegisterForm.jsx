@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import { registerClient } from '../services/register';
+import { extractApiErrorMessage } from '../../../share/utils/httpError';
+
 
 const RegisterForm = ( {onClose} ) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,42 +22,23 @@ const RegisterForm = ( {onClose} ) => {
       // Preparar los datos para enviar al backend
       const userData = {
         name: data.fullName.split(' ')[0], // Primer nombre
-        lastname: data.fullName.split(' ').slice(1).join(' '), // Apellidos
+        lastName: data.fullName.split(' ').slice(1).join(' '), // Apellidos
         email: data.email,
         password: data.password, // El backend se encargará del hash
         dni: data.dni,
-        rol: 'CLIENT' // Por defecto es cliente
       };
 
-      {/* Gaston: Aqui se maneja peticion, cuando este listo el back lo actualizamos */}
-      const response = await fetch('http://localhost:5173/api/users/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData)
-      });
-
-      if (!response.ok) {
-        // Si el servidor responde con error (400, 500, etc.)
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al registrar usuario');
-      }
-
-      const result = await response.json();
-      console.log('Usuario registrado exitosamente:', result);
+      const result = await registerClient(userData);      
+      toast.success(result?.message || 'Usuario registrado correctamente');
       
       setSubmitStatus('success');
-      reset(); // Limpiar el formulario
-      
-      // Opcional: Redirigir después de 2 segundos
-      setTimeout(() => {
-        // window.location.href = '/login';
-        console.log('Redirigir a login...');
-      }, 2000);
+      reset(); // Limpiar el formulario      
+      onClose && onClose();
 
     } catch (error) {
       console.error('Error:', error);
+      const errorText = extractApiErrorMessage(error, 'Error al registrar usuario');
+      toast.error(errorText);
       setSubmitStatus('error');
     } finally {
       setIsLoading(false);

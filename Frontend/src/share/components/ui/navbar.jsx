@@ -1,14 +1,54 @@
 import { useState } from "react";
-import { Menu, X, CircleUser, Bell } from "lucide-react";
-import { NavLink } from "react-router-dom";
-import Login from '../../../features/auth/components/LoginForm.jsx'
-import Register from '../../../features/auth/components/RegisterForm.jsx'
+import {
+  Menu,
+  X,
+  CircleUser,
+  Bell,
+  ChevronDown,
+  UserCircle,
+  LayoutDashboard,
+  GaugeCircle,
+  LogOut,
+  Building,
+  Building2,
+} from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import useAuthStore from "../../../features/auth/hooks/useAuthStore.js";
+import Login from "../../../features/auth/components/LoginForm.jsx";
+import Register from "../../../features/auth/components/RegisterForm.jsx";
 
-const Navbar = ({ variant = "home", user }) => {
+const Navbar = ({ variant = "home" }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  const navigate = useNavigate();
+  const { email, roles, clearAuth, isAuthenticated } = useAuthStore();
+
+  const handleLogout = () => {
+    clearAuth();
+    navigate("/");
+  };
+
+  const handleOpenLogin = () => {
+    setShowLogin(true);
+    setShowRegister(false);
+    setIsMenuOpen(false);
+  };
+
+  const handleOpenRegister = () => {
+    setShowRegister(true);
+    setShowLogin(false);
+    setIsMenuOpen(false);
+  };
+
+  const handleCloseModals = () => {
+    setShowLogin(false);
+    setShowRegister(false);
+  };
+
+  // LINKS
   const homeLinks = [
     { to: "/", label: "Inicio" },
     { to: "/nosotros", label: "Nosotros" },
@@ -42,23 +82,6 @@ const Navbar = ({ variant = "home", user }) => {
       ? pymeLinks
       : homeLinks;
 
-  const handleOpenLogin = () => {
-    setShowLogin(true);
-    setShowRegister(false);
-    setIsMenuOpen(false);
-  };
-
-  const handleOpenRegister = () => {
-    setShowRegister(true);
-    setShowLogin(false);
-    setIsMenuOpen(false);
-  };
-
-  const handleCloseModals = () => {
-    setShowLogin(false);
-    setShowRegister(false);
-  };
-
   return (
     <>
       <div className="fixed w-full top-0 z-50">
@@ -66,14 +89,13 @@ const Navbar = ({ variant = "home", user }) => {
           <div className="h-9 bg-primary" />
           <div className="w-full px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
+              {/* LOGO + LINKS */}
               <div className="flex items-center space-x-6 lg:space-x-10">
-                <div className="flex-1 items-center">
-                  <img
-                    src="/logo.svg"
-                    alt="PYFIN"
-                    className="h-18 w-auto -mt-9"
-                  />
-                </div>
+                <img
+                  src="/logo.svg"
+                  alt="PYFIN"
+                  className="h-18 w-auto -mt-9"
+                />
                 {links.map((link) => (
                   <NavLink
                     key={link.to}
@@ -92,39 +114,100 @@ const Navbar = ({ variant = "home", user }) => {
                 ))}
               </div>
 
-              {variant === "home" ? (
+              {/* AUTENTICACIÓN / DROPDOWN */}
+              {isAuthenticated() ? (
+                <div className="relative hidden lg:flex items-center space-x-4">
+                  <Bell className="h-5 w-5 text-Violet cursor-pointer" />
+                  <button
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="flex items-center gap-2 font-semibold text-text hover:text-secondary"
+                  >
+                    <CircleUser className="h-5 w-5 text-Violet" />
+                    {email || "Usuario"}
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+
+                  {/* DROPDOWN */}
+                  {dropdownOpen && (
+                    <div className="absolute right-0 top-8 w-48 bg-white z-50 text-primary">
+                      <button
+                        onClick={() => {
+                          navigate("/perfil");
+                          setDropdownOpen(false);
+                        }}
+                        className="flex gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                      >
+                        <UserCircle /> Mi perfil
+                      </button>
+
+                      {/* SOLO EN HOME: enlaces a panel según rol */}
+                      {variant === "home" && roles.includes("CLIENT") && (
+                        <button
+                          onClick={() => {
+                            navigate("/panel");
+                            setDropdownOpen(false);
+                          }}
+                          className="flex gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                        >
+                          <LayoutDashboard /> Panel
+                        </button>
+                      )}
+                      {variant === "home" &&
+                        roles.some((r) =>
+                          ["OPERATOR", "OPERADOR", "ADMIN"].includes(r)
+                        ) && (
+                          <button
+                            onClick={() => {
+                              navigate("/operador/panel");
+                              setDropdownOpen(false);
+                            }}
+                            className="flex gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                          >
+                            <GaugeCircle /> Operador
+                          </button>
+                        )}
+
+                      {/* CUENTA EMPRESA para Pyme */}
+                      {variant === "pyme" && (
+                        <button
+                          onClick={() => {
+                            navigate("/panel/cuenta");
+                            setDropdownOpen(false);
+                          }}
+                          className="flex gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                        >
+                          <Building2 /> Cuenta empresa
+                        </button>
+                      )}
+
+                      <button
+                        onClick={handleLogout}
+                        className="flex gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                      >
+                        <LogOut /> Cerrar sesión
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
                 <div className="hidden lg:flex items-center space-x-4">
                   <button
                     onClick={handleOpenLogin}
-                    className="px-4 py-2 text-text font-medium cursor-pointer inline-flex items-center gap-2"
+                    className="px-4 py-2 text-text font-medium inline-flex items-center gap-2"
                   >
                     <CircleUser className="h-5 w-5 text-Violet" />
                     Ingresar
                   </button>
                   <button
                     onClick={handleOpenRegister}
-                    className="px-6 py-2 bg-Violet text-white font-semibold rounded-full shadow-sm cursor-pointer"
+                    className="px-6 py-2 bg-Violet text-white font-semibold rounded-full shadow-sm"
                   >
                     Crear cuenta
                   </button>
                 </div>
-              ) : (
-                <div className="hidden lg:flex items-center space-x-6">
-                  <Bell className="h-5 w-5 text-Violet" />
-                  <CircleUser className="h-5 w-5 text-Violet" />
-                  {variant === "operator" && (
-                    <span className="font-bold text-xl text-text">
-                      {`Hola ${user?.name ?? "Usuario"}!`}
-                    </span>
-                  )}
-                  {variant === "pyme" && (
-                    <span className="font-bold text-xl text-text">
-                      {user?.companyName ?? "Nombrepyme"}
-                    </span>
-                  )}
-                </div>
               )}
 
+              {/* MENÚ MÓVIL */}
               <div className="lg:hidden">
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -140,6 +223,7 @@ const Navbar = ({ variant = "home", user }) => {
             </div>
           </div>
 
+          {/* MENÚ MÓVIL DESPLEGABLE */}
           {isMenuOpen && (
             <div className="lg:hidden bg-white border-t">
               <div className="px-2 pt-2 pb-3 space-y-1">
@@ -151,43 +235,89 @@ const Navbar = ({ variant = "home", user }) => {
                     end
                     className={({ isActive }) =>
                       `block w-full text-left px-3 py-2 font-medium transition-colors ${
-                        isActive ? "text-secondary" : "text-text hover:bg-gray-50"
+                        isActive
+                          ? "text-secondary"
+                          : "text-text hover:bg-gray-50"
                       }`
                     }
                   >
                     {link.label}
                   </NavLink>
                 ))}
-                {variant === "home" ? (
+
+                {isAuthenticated() ? (
+                  
+                  <div className="text-text">
+                    <div class="h-px bg-gray-300 my-4"></div>
+                    <button
+                      onClick={() => {
+                        navigate("/perfil");
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-3 py-2 font-medium hover:bg-gray-50"
+                    >
+                      Mi perfil
+                    </button>
+
+                    {variant === "home" && roles.includes("CLIENT") && (
+                      <button
+                        onClick={() => {
+                          navigate("/panel");
+                          setIsMenuOpen(false);
+                        }}
+                        className="block w-full text-left px-3 py-2 font-medium hover:bg-gray-50"
+                      >
+                        Panel
+                      </button>
+                    )}
+                    {variant === "home" &&
+                      roles.some((r) => ["OPERATOR"].includes(r)) && (
+                        <button
+                          onClick={() => {
+                            navigate("/operador/panel");
+                            setIsMenuOpen(false);
+                          }}
+                          className="block w-full text-left px-3 py-2 font-medium hover:bg-gray-50"
+                        >
+                          Admin
+                        </button>
+                      )}
+
+                    {variant === "pyme" && (
+                      <button
+                        onClick={() => {
+                          navigate("/panel/cuenta");
+                          setIsMenuOpen(false);
+                        }}
+                        className="block w-full text-left px-3 py-2 font-medium hover:bg-gray-50"
+                      >
+                        Cuenta empresa
+                      </button>
+                    )}
+
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-3 py-2 font-medium hover:bg-gray-50"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </div>
+                ) : (
                   <>
                     <button
                       onClick={handleOpenLogin}
-                      className="w-full text-left px-3 py-2 text-text font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                      className="block w-full text-left px-3 py-2 hover:bg-gray-50 flex items-center gap-2"
                     >
                       <CircleUser className="h-5 w-5 text-Violet" />
                       Ingresar
                     </button>
                     <button
                       onClick={handleOpenRegister}
-                      className="block w-full max-w-md text-left px-3 py-2 bg-Violet text-white font-medium rounded-full hover:opacity-90 transition-opacity"
+                      className="block w-full text-left px-3 py-2 bg-Violet text-white font-medium rounded-full hover:opacity-90"
                     >
                       Crear cuenta
                     </button>
                   </>
-                ) : (
-                  <div className="flex items-center gap-4 px-3 py-2">
-                    <Bell className="h-5 w-5 text-Violet" />
-                    <CircleUser className="h-5 w-5 text-Violet" />
-                    {variant === "operator" ? (
-                      <span className="font-semibold text-text">{`Hola ${
-                        user?.name ?? "Usuario"
-                      }!`}</span>
-                    ) : (
-                      <span className="font-semibold text-text">
-                        {user?.companyName ?? "Nombrepyme"}
-                      </span>
-                    )}
-                  </div>
                 )}
               </div>
             </div>
@@ -195,29 +325,25 @@ const Navbar = ({ variant = "home", user }) => {
         </nav>
       </div>
 
-      {/* Modal Login */}
+      {/* MODALES */}
       {showLogin && (
         <div
           className="fixed inset-0 flex items-center justify-end z-50 p-4"
           onClick={handleCloseModals}
         >
-          <div 
-            className="max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <Login onClose={handleCloseModals} />
           </div>
         </div>
       )}
 
-      {/* Modal Register */}
       {showRegister && (
         <div
-          className="fixed inset-0 bg-alt-transparent flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/40"
           onClick={handleCloseModals}
         >
           <div
-            className="max-w-2xl w-full max-h-screen overflow-y-auto"
+            className="max-w-2xl w-full"
             onClick={(e) => e.stopPropagation()}
           >
             <Register onClose={handleCloseModals} />
