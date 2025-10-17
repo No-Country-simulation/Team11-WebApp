@@ -5,6 +5,7 @@ import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.nocountry.pyme_creditos.enums.DocumentType;
@@ -24,7 +25,15 @@ public class DocumentService {
 	private final DocumentRepository documentRepository;
 	private final CreditApplicationRepository applicationRepository;
 
-	private final Path rootPath = Paths.get("uploads"); //carpeta para almacenar documentos
+	private final Path rootPath;
+	
+	public DocumentService(DocumentRepository documentRepository,
+						   CreditApplicationRepository applicationRepository,
+						   @Value("${file.upload-dir:uploads}") String uploadDir) {
+		this.documentRepository = documentRepository;
+		this.applicationRepository = applicationRepository;
+		this.rootPath = Paths.get(uploadDir);
+	}
 	
 	public Document uploadDocument(UUID applicationId, DocumentType type, MultipartFile file) throws IOException {
 		
