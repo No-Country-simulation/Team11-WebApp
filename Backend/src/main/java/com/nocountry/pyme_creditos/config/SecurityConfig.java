@@ -4,6 +4,7 @@ package com.nocountry.pyme_creditos.config;
 import com.nocountry.pyme_creditos.security.JwtAuthenticationEntryPoint;
 import com.nocountry.pyme_creditos.security.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +19,12 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -30,9 +37,14 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationEntryPoint entryPoint; // @Component
 
+    @Value("${cors.allowed-origins}")
+    private String allowedOriginsProp;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> {})
+
                 // API stateless (sin cookies csrf)
                 .csrf(csrf -> csrf.disable())
 
@@ -44,6 +56,7 @@ public class SecurityConfig {
 
                 // Autorización por rutas
                 .authorizeHttpRequests(auth -> auth
+
                         // públicas
                         .requestMatchers(
                                 "/auth/login",
@@ -79,5 +92,20 @@ public class SecurityConfig {
         // Al registrar un usuario, se debe usar este mismo encoder para cifrar su contraseña
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        List<String> origins = Arrays.asList(allowedOriginsProp.split(","));
+        configuration.setAllowedOrigins(origins);
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "X-User-Id"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
 
 }
