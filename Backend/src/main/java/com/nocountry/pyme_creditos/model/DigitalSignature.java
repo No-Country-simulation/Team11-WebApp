@@ -17,8 +17,8 @@ import java.util.UUID;
 public class DigitalSignature {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue(strategy = GenerationType.UUID)
+
     @Column(name = "id_signature", updatable = false, nullable = false)
     private UUID id;
 
