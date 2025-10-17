@@ -44,7 +44,7 @@ const CreditApplicationForm = () => {
             Paso {currentStep} de 4: {getStepTitle()}
           </h2>
         </div>
-        {currentStep === 3 && <SquarePen className="h-6 w-6" />}
+        {currentStep === 3 && <SquarePen className="h-6 w-6 text-Green" />}
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -76,7 +76,7 @@ const CreditApplicationForm = () => {
               </label>
               <input
                 id="requestedAmount"
-                type="text"
+                type="number"
                 {...register('requestedAmount', { required: 'Este campo es obligatorio' })}
                 className="w-full px-4 py-2 border  text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
@@ -89,13 +89,25 @@ const CreditApplicationForm = () => {
             <div>
               <label htmlFor="financingTerm" className="block  text-Green font-medium mb-2">
                 Plazo deseado de financiación *
-              </label>
+              </label>{/*
               <input
                 id="financingTerm"
-                type="text"
+                type="date"
                 {...register('financingTerm', { required: 'Este campo es obligatorio' })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-              />
+                className="w-full px-4 py-2 text-Green border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+              />*/}
+              <select
+                id="financingTerm"
+                {...register('financingTerm', { required: 'Este campo es obligatorio' })}
+                className="w-full px-4 py-2 text-Green border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+              >
+                <option value="" className='text-Green'>Seleccione una opción</option>
+                <option value="3 meses" className='text-Green'>3 Meses</option>
+                <option value="6 meses" className='text-Green'>6 Meses</option>
+                <option value="12 meses" className='text-Green'>12 Meses</option>
+                <option value="18 meses" className='text-Green'>18 Meses</option>
+                <option value="24 meses" className='text-Green'>24 Meses</option>
+              </select>
               {errors.financingTerm && (
                 <span className="text-red-500 text-sm block">{errors.financingTerm.message}</span>
               )}
@@ -125,13 +137,25 @@ const CreditApplicationForm = () => {
             <div>
               <label htmlFor="estimatedDate" className="block  text-Green font-medium mb-2">
                 Fecha estimada en que se necesita el crédito (opcional)
-              </label>
+              </label>{/*
               <input
                 id="estimatedDate"
-                type="text"
+                type="date"
                 {...register('estimatedDate')}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-              />
+                className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+              />*/}
+              <select
+                id="estimatedDate"
+                {...register('estimatedDate')}
+                className="w-full px-4 py-2 text-Green border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+              >
+                <option value="" className='text-Green'>Seleccione una opción</option>
+                <option value="3 meses" className='text-Green'>3 Meses</option>
+                <option value="6 meses" className='text-Green'>6 Meses</option>
+                <option value="12 meses" className='text-Green'>12 Meses</option>
+                <option value="18 meses" className='text-Green'>18 Meses</option>
+                <option value="24 meses" className='text-Green'>24 Meses</option>
+              </select>
               <p className="text-sm text-gray-600 mt-1">Ejemplo: DD/MM/AAAA</p>
             </div>
           </>
@@ -145,7 +169,7 @@ const CreditApplicationForm = () => {
               </label>
               <input
                 id="monthlyRevenue"
-                type="text"
+                type="number"
                 defaultValue={formData.monthlyRevenue || ''}
                 {...register('monthlyRevenue', { required: 'Este campo es obligatorio' })}
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
@@ -162,7 +186,7 @@ const CreditApplicationForm = () => {
               </label>
               <input
                 id="monthlyExpenses"
-                type="text"
+                type="number"
                 defaultValue={formData.monthlyExpenses || ''}
                 {...register('monthlyExpenses', { required: 'Este campo es obligatorio' })}
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
@@ -182,7 +206,7 @@ const CreditApplicationForm = () => {
                 type="file"
                 accept=".pdf"
                 {...register('documents', { required: 'Este campo es obligatorio' })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
               {errors.documents && (
                 <span className="text-red-500 text-sm block">{errors.documents.message}</span>
@@ -225,7 +249,7 @@ const CreditApplicationForm = () => {
               </label>
               <input
                 id="requestedAmount"
-                type="text"
+                type="number"
                 defaultValue={formData.requestedAmount || ''}
                 {...register('requestedAmount', { required: 'Este campo es obligatorio' })}
                 className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
@@ -238,14 +262,27 @@ const CreditApplicationForm = () => {
             <div>
               <label htmlFor="financingTerm" className="block text-Green font-medium mb-2">
                 Plazo deseado de financiación *
-              </label>
+              </label>{/*
               <input
                 id="financingTerm"
-                type="text"
+                type="date"
                 defaultValue={formData.financingTerm || ''}
                 {...register('financingTerm', { required: 'Este campo es obligatorio' })}
                 className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-              />
+              />*/}
+              <select
+                id="financingTerm"
+                defaultValue={formData.financingTerm || ''}
+                {...register('financingTerm', { required: 'Este campo es obligatorio' })}
+                className="w-full px-4 py-2 text-Green border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+              >
+                <option value="" className='text-Green'>Seleccione una opción</option>
+                <option value="3 meses" className='text-Green'>3 Meses</option>
+                <option value="6 meses" className='text-Green'>6 Meses</option>
+                <option value="12 meses" className='text-Green'>12 Meses</option>
+                <option value="18 meses" className='text-Green'>18 Meses</option>
+                <option value="24 meses" className='text-Green'>24 Meses</option>
+              </select>
               {errors.financingTerm && (
                 <span className="text-red-500 text-sm block">{errors.financingTerm.message}</span>
               )}
@@ -260,7 +297,7 @@ const CreditApplicationForm = () => {
                 type="text"
                 defaultValue={formData.creditPurpose || ''}
                 {...register('creditPurpose', { required: 'Este campo es obligatorio' })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
               {errors.creditPurpose && (
                 <span className="text-red-500 text-sm">{errors.creditPurpose.message}</span>
@@ -268,28 +305,41 @@ const CreditApplicationForm = () => {
             </div>
 
             <div>
-              <label htmlFor="estimatedDate" className="block font-medium mb-2">
+              <label htmlFor="estimatedDate" className="block text-Green font-medium mb-2">
                 Fecha estimada en que necesita el crédito (opcional)
-              </label>
+              </label>{/*
               <input
                 id="estimatedDate"
-                type="text"
+                type="date"
                 defaultValue={formData.estimatedDate || ''}
                 {...register('estimatedDate')}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-              />
+                className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+              />*/}
+              <select
+                id="estimatedDate"
+                defaultValue={formData.estimatedDate || ''}
+                {...register('estimatedDate')}
+                className="w-full px-4 py-2 text-Green border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+              >
+                <option value="" className='text-Green'>Seleccione una opción</option>
+                <option value="3 meses" className='text-Green'>3 Meses</option>
+                <option value="6 meses" className='text-Green'>6 Meses</option>
+                <option value="12 meses" className='text-Green'>12 Meses</option>
+                <option value="18 meses" className='text-Green'>18 Meses</option>
+                <option value="24 meses" className='text-Green'>24 Meses</option>
+              </select>
             </div>
 
             <div>
-              <label htmlFor="monthlyRevenue" className="block font-medium mb-2">
+              <label htmlFor="monthlyRevenue" className="block text-Green font-medium mb-2">
                 Facturación mensual promedio *
               </label>
               <input
                 id="monthlyRevenue"
-                type="text"
+                type="number"
                 defaultValue={formData.monthlyRevenue || ''}
                 {...register('monthlyRevenue', { required: 'Este campo es obligatorio' })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
               {errors.monthlyRevenue && (
                 <span className="text-red-500 text-sm block">{errors.monthlyRevenue.message}</span>
@@ -297,15 +347,15 @@ const CreditApplicationForm = () => {
             </div>
 
             <div>
-              <label htmlFor="monthlyExpenses" className="block font-medium mb-2">
+              <label htmlFor="monthlyExpenses" className="block text-Green font-medium mb-2">
                 Gasto mensual promedio *
               </label>
               <input
                 id="monthlyExpenses"
-                type="text"
+                type="number"
                 defaultValue={formData.monthlyExpenses || ''}
                 {...register('monthlyExpenses', { required: 'Este campo es obligatorio' })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
               {errors.monthlyExpenses && (
                 <span className="text-red-500 text-sm block">{errors.monthlyExpenses.message}</span>
@@ -313,7 +363,7 @@ const CreditApplicationForm = () => {
             </div>
 
             <div>
-              <label htmlFor="documents" className="block font-medium mb-2">
+              <label htmlFor="documents" className="block text-Green font-medium mb-2">
                 Adjuntar documentación {!formData.documents && '*'} (Balance General, Estado de Resultados, DDJJ IVA o IIBB, etc.)
               </label>
               <input
@@ -323,7 +373,7 @@ const CreditApplicationForm = () => {
                 {...register('documents', { 
                   required: !formData.documents ? 'Este campo es obligatorio' : false 
                 })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
               {errors.documents && (
                 <span className="text-red-500 text-sm block">{errors.documents.message}</span>
@@ -370,7 +420,7 @@ const CreditApplicationForm = () => {
         {currentStep === 4 && (
           <>
             <div>
-              <label htmlFor="digitalSignature" className="block font-medium mb-2">
+              <label htmlFor="digitalSignature" className="block text-Green font-medium mb-2">
                 Adjuntar firma digital *
               </label>
               <input
@@ -378,7 +428,7 @@ const CreditApplicationForm = () => {
                 type="file"
                 accept=".pdf"
                 {...register('digitalSignature', { required: 'Este campo es obligatorio' })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
               {errors.digitalSignature && (
                 <span className="text-red-500 text-sm block">{errors.digitalSignature.message}</span>
