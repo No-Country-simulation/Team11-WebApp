@@ -63,12 +63,19 @@ const CompanyProfile = () => {
             {...register('activity')}
             className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-Green"
           >
-            <option value="">Seleccione una opción</option>
-            <option value="proximamente1">Próximamente</option>
-            <option value="proximamente2">Próximamente</option>
-            <option value="proximamente3">Próximamente</option>
-            <option value="proximamente4">Próximamente</option>
-            <option value="proximamente5">Próximamente</option>
+            <option value="">Elige la opción que corresponda</option>
+            <option value="Agropecuaria">Agropecuaria</option>
+            <option value="Industrial / Manufactura">Industrial / Manufactura</option>
+            <option value="Construcción">Construcción</option>
+            <option value="Comercio">Comercio</option>
+            <option value="Servicios">Servicios</option>
+            <option value="Tecnología">Tecnología</option>
+            <option value="Energía / Minería">Energía / Minería</option>
+            <option value="Transporte y Logística">Transporte y Logística</option>
+            <option value="Educación y Salud">Educación y Salud</option>
+            <option value="Turismo y Gastronomía">Turismo y Gastronomía</option>
+            <option value="Finanzas">Finanzas</option>
+            <option value="Otros">Otros</option>
           </select>
         </div>
 
