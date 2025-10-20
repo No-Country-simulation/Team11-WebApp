@@ -41,15 +41,25 @@ public class DocumentService {
 		CreditApplication app = applicationRepository.findById(applicationId)
 								.orElseThrow(() -> new NotFoundException("La solicitud de crédito con id " + applicationId + " no existe"));
 		
-		//Crea la carpeta si no existe
-		if(!Files.exists(rootPath)) {
-			Files.createDirectories(rootPath);
+		//Valida que el archivo no este vacio
+		if (file.isEmpty()) {
+			throw new BadRequestException("El archivo no puede estar vacio.");
+		}
+		
+		if(!isValidType(file)) {
+			throw new BadRequestException("Tipo de archivo no permitido. Solo se permite: PDF, JPG, PNG");
 		}
 		
 		//Valida el tamaño (máximo 5MB)
 		if(file.getSize() > 5 * 1024 * 1024) {
 			throw new BadRequestException("El tamaño del archivo es muy grande (mayor a 5MG");
+		}		
+		
+		//Crea la carpeta si no existe
+		if(!Files.exists(rootPath)) {
+			Files.createDirectories(rootPath);
 		}
+
 		
 		//Genera nombre único
 		String uniqueName = UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -67,5 +77,15 @@ public class DocumentService {
 		
 		return documentRepository.save(document);
 		
+	}
+	
+	private boolean isValidFileType(MultipartFile file) {
+		String contentType = file.getContentType();
+		return contentType !null && (
+			contentType.equals("application/pdf") ||
+			contentType.equals("image/jpeg") ||
+			contentType.equals("image/jpg") ||
+			contentType.equals("image/png")
+		);
 	}
 }
