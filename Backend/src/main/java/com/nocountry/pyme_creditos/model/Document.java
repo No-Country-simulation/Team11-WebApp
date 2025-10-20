@@ -39,7 +39,7 @@ public class Document {
 	private String fileUrl;
 	
 	@Column(name = "document_uploaded_at", nullable = false)
-	private LocalDateTime documentUploadeddAt = LocalDateTime.now();
+	private LocalDateTime documentUploadedAt = LocalDateTime.now();
 	
 	@Column(name = "is_valid", nullable = false)
 	private boolean isValid = false;
