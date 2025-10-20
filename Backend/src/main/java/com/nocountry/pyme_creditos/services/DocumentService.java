@@ -1,13 +1,17 @@
 package com.nocountry.pyme_creditos.services;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import com.nocountry.pyme_creditos.enums.DocumentType;
 import com.nocountry.pyme_creditos.exceptions.BadRequestException;
 import com.nocountry.pyme_creditos.exceptions.NotFoundException;
@@ -46,7 +50,7 @@ public class DocumentService {
 			throw new BadRequestException("El archivo no puede estar vacio.");
 		}
 		
-		if(!isValidType(file)) {
+		if(!isValidFileType(file)) {
 			throw new BadRequestException("Tipo de archivo no permitido. Solo se permite: PDF, JPG, PNG");
 		}
 		
@@ -81,7 +85,7 @@ public class DocumentService {
 	
 	private boolean isValidFileType(MultipartFile file) {
 		String contentType = file.getContentType();
-		return contentType !null && (
+		return contentType !=null && (
 			contentType.equals("application/pdf") ||
 			contentType.equals("image/jpeg") ||
 			contentType.equals("image/jpg") ||
