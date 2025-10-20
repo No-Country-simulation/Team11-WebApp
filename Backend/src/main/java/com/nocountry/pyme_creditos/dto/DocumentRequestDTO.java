@@ -8,6 +8,7 @@ import lombok.Data;
 
 @Data
 public class DocumentRequestDTO {
-	private MultipartFile file;
 	private DocumentType type;
+	private String applicationId;
+	private MultipartFile file;
 }
