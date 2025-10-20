@@ -12,7 +12,7 @@ import {
   Building,
   Building2,
 } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import useAuthStore from "../../../features/auth/hooks/useAuthStore.js";
 import Login from "../../../features/auth/components/LoginForm.jsx";
 import Register from "../../../features/auth/components/RegisterForm.jsx";
@@ -24,7 +24,11 @@ const Navbar = ({ variant = "home" }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { email, roles, clearAuth, isAuthenticated } = useAuthStore();
+
+  // Detectar si estamos en rutas de operador
+  const isOperatorRoute = location.pathname.startsWith('/operador');
 
   const handleLogout = () => {
     clearAuth();
@@ -55,6 +59,12 @@ const Navbar = ({ variant = "home" }) => {
     { to: "/financiamiento", label: "Financiamiento" },
   ];
 
+  const operatorHomeLinks = [
+    { to: "/operador", label: "Inicio", end: true},
+    { to: "/operador/nosotros", label: "Nosotros" },
+    { to: "/operador/financiamiento", label: "Financiamiento" },
+  ];
+
   const pymeLinks = [
     { to: "/panel", label: "Inicio", end: true },
     { to: "/panel/mis-solicitudes", label: "Mis solicitudes" },
@@ -75,12 +85,21 @@ const Navbar = ({ variant = "home" }) => {
     },
   ];
 
-  const links =
-    variant === "operator"
-      ? operatorLinks
-      : variant === "pyme"
-      ? pymeLinks
-      : homeLinks;
+  // Determinar qué enlaces mostrar basado en la ruta actual
+  const getLinks = () => {
+    if (isOperatorRoute && !location.pathname.startsWith('/operador/panel')) {
+      return operatorHomeLinks;
+    }
+    if (variant === "operator" || location.pathname.startsWith('/operador/panel')) {
+      return operatorLinks;
+    }
+    if (variant === "pyme") {
+      return pymeLinks;
+    }
+    return homeLinks;
+  };
+
+  const links = getLinks();
 
   return (
     <>

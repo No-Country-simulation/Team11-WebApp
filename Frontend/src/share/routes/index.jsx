@@ -27,9 +27,15 @@ export default function AppRoutes() {
       <Route element={<HomeLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/nosotros" element={<AboutUsPage />} />
-        <Route path="/financiamiento" element={<FinancingPage />} />
+        <Route path="/financiamiento" element={<FinancingPage />} />        
       </Route>
-
+      
+      <Route element={<HomeLayout />}>
+        <Route path="/operador" element={<HomePage />} />
+        <Route path="/operador/nosotros" element={<AboutUsPage />} />
+        <Route path="/operador/financiamiento" element={<FinancingPage />} />        
+      </Route>
+            
       {/* --- Panel PYME (solo CLIENT) --- */}
       <Route element={<ProtectedRoute allowedRoles={["CLIENT"]} />}>
         <Route path="/panel" element={<PymeLayout />}>

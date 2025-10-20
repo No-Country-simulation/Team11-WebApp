@@ -1,12 +1,15 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { registerClient } from '../services/register';
+import { registerClient, registerOperator } from '../services/register';
 import { extractApiErrorMessage } from '../../../share/utils/httpError';
 
 
 const RegisterForm = ( {onClose} ) => {
+  const location = useLocation();
+  const isOperatorRoute = location.pathname.startsWith('/operador');
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +31,9 @@ const RegisterForm = ( {onClose} ) => {
         dni: data.dni,
       };
 
-      const result = await registerClient(userData);      
+      const result = isOperatorRoute
+        ? await registerOperator(userData)
+        : await registerClient(userData);
       toast.success(result?.message || 'Usuario registrado correctamente');
       
       setSubmitStatus('success');
