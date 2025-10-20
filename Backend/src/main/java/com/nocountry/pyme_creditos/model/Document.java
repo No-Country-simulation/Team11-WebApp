@@ -21,6 +21,10 @@ public class Document {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "id_document", updatable = false, nullable = false)
 	private UUID id;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User uploadedBy;
 	
 	//Relacion con CreditApplication
 	@ManyToOne(fetch = FetchType.LAZY)
