@@ -63,7 +63,7 @@ public class CreditApplication {
     @Column(name = "updatedAt", nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    // Método para actualizar fecha de modificación automáticamente
+    // Metodo para actualizar fecha de modificación automáticamente
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
