@@ -1,20 +1,13 @@
-# 1️⃣ Imagen base ligera de Java
-FROM openjdk:17-jdk-alpine
-
-# 2️⃣ Crear un usuario no root para seguridad
-RUN addgroup -S spring && adduser -S spring -G spring
-
-# 3️⃣ Directorio de trabajo
+# Etapa build con Maven
+FROM maven:3.9.2-eclipse-temurin-17 AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# 4️⃣ Copiar el JAR desde target/
-COPY target/pyme-creditos-0.0.1-SNAPSHOT.jar app.jar
-
-# 5️⃣ Cambiar a usuario no root
-USER spring:spring
-
-# 6️⃣ Exponer el puerto que usa tu aplicación (Spring Boot por defecto 8080)
+# Etapa final: imagen ligera de Java
+FROM openjdk:17-jdk-alpine
+WORKDIR /app
+COPY --from=build /app/target/pyme-creditos-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
-
-# 7️⃣ Comando por defecto para iniciar la app
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","app.jar"]
