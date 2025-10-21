@@ -61,7 +61,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/auth/login",
                                 "/auth/register",
-                                "/auth/operator/register",
+                                "/auth/operator/register", "/api/companies/",
                                 "/auth/.well-known/jwks.json"
                         ).permitAll()
 
