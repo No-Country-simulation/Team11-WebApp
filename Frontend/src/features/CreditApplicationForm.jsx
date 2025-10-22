@@ -137,14 +137,14 @@ const CreditApplicationForm = () => {
             <div>
               <label htmlFor="estimatedDate" className="block  text-Green font-medium mb-2">
                 Fecha estimada en que se necesita el crédito (opcional)
-              </label>{/*
+              </label>
               <input
                 id="estimatedDate"
                 type="date"
                 {...register('estimatedDate')}
                 className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-              />*/}
-              <select
+              />
+              {/*<select
                 id="estimatedDate"
                 {...register('estimatedDate')}
                 className="w-full px-4 py-2 text-Green border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
@@ -155,7 +155,7 @@ const CreditApplicationForm = () => {
                 <option value="12 meses" className='text-Green'>12 Meses</option>
                 <option value="18 meses" className='text-Green'>18 Meses</option>
                 <option value="24 meses" className='text-Green'>24 Meses</option>
-              </select>
+              </select>*/}
               <p className="text-sm text-gray-600 mt-1">Ejemplo: DD/MM/AAAA</p>
             </div>
           </>
@@ -307,15 +307,15 @@ const CreditApplicationForm = () => {
             <div>
               <label htmlFor="estimatedDate" className="block text-Green font-medium mb-2">
                 Fecha estimada en que necesita el crédito (opcional)
-              </label>{/*
+              </label>
               <input
                 id="estimatedDate"
                 type="date"
                 defaultValue={formData.estimatedDate || ''}
                 {...register('estimatedDate')}
                 className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-              />*/}
-              <select
+              />
+              {/*<select
                 id="estimatedDate"
                 defaultValue={formData.estimatedDate || ''}
                 {...register('estimatedDate')}
@@ -327,7 +327,7 @@ const CreditApplicationForm = () => {
                 <option value="12 meses" className='text-Green'>12 Meses</option>
                 <option value="18 meses" className='text-Green'>18 Meses</option>
                 <option value="24 meses" className='text-Green'>24 Meses</option>
-              </select>
+              </select>*/}
             </div>
 
             <div>
