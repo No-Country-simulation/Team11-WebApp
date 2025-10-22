@@ -9,4 +9,10 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByEmail(String email);
+
+    // Método para encontrar usuario por ID con UUID
+    Optional<User> findById(UUID id);
+
+    // Si necesitas buscar por un ID numérico (Long) también, puedes agregar:
+    // Optional<User> findByUserId(Long userId);
 }

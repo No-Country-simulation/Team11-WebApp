@@ -1,4 +1,11 @@
 package com.nocountry.pyme_creditos.enums;
 
-public class KYCStatus {
+public enum KYCStatus {
+	  PENDING,
+	  IN_PROGRESS,
+	  APPROVED,
+	  REJECTED,
+	  EXPIRED,
+	  MANUAL_REVIEW	
 }
+

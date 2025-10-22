@@ -1,4 +1,9 @@
 package com.nocountry.pyme_creditos.enums;
 
-public class TaskStatus {
+public enum TaskStatus {
+    PENDING,        // Pendiente
+    IN_PROGRESS,    // En progreso
+    COMPLETED,      // Completado
+    CANCELLED,      // Cancelado
+    REJECTED        // Rechazado
 }

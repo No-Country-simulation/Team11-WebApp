@@ -5,10 +5,10 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
@@ -19,6 +19,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Date;
 import java.util.Map;
+import org.springframework.core.io.ResourceLoader;
 
 @Component
 @RequiredArgsConstructor
@@ -34,7 +35,9 @@ public class JwtUtilRsa {
     private Long expirationMinutes;
 
     private final ResourceLoader resourceLoader;
+
     private PrivateKey privateKey;
+    @Getter
     private PublicKey publicKey;
 
     @PostConstruct
@@ -97,10 +100,6 @@ public class JwtUtilRsa {
         } catch (Exception e) {
             return false;
         }
-    }
-
-    public PublicKey getPublicKey() {
-        return publicKey;
     }
 
     public RSAPublicKey getRsaPublicKey() {

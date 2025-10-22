@@ -1,4 +1,11 @@
 package com.nocountry.pyme_creditos.enums;
 
-public class TransferPurpose {
+public enum TransferPurpose {
+	  INVESTMENT,
+	  SUPPLIER_PAYMENT,
+	  SALARIES,
+	  SERVICES,
+	  TAX_PAYMENT,
+	  LOAN_DISBURSEMENT,
+	  OTHER
 }
