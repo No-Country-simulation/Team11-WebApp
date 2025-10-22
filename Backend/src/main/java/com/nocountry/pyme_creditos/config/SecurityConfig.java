@@ -62,7 +62,10 @@ public class SecurityConfig {
                                 "/auth/login",
                                 "/auth/register",
                                 "/auth/operator/register",
-                                "/auth/.well-known/jwks.json"
+                                "/auth/.well-known/jwks.json",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
                         ).permitAll()
 
                         // ej. por rol (opcional, si es que lo vamos a usar)
