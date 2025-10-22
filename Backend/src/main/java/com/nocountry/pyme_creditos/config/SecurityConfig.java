@@ -64,9 +64,18 @@ public class SecurityConfig {
                                 "/auth/operator/register",
                                 "/auth/.well-known/jwks.json"
                         ).permitAll()
+                        // 👨‍💼 RUTAS SOLO PARA OPERADORES
+                        .requestMatchers(
+                                "/api/credit-applications/pending",
+                                "/api/credit-applications/under-review",
+                                "/api/credit-applications/for-review",
+                                "/api/credit-applications/*/status",
+                                "/api/application-history/**",
+                                "/operator/**"
+                        ).hasRole("OPERATOR")
 
                         // ej. por rol (opcional, si es que lo vamos a usar)
-                        .requestMatchers("/operator/**").hasRole("OPERATOR")
+                        ///.requestMatchers("/operator/**").hasRole("OPERATOR")
                         .requestMatchers("/client/**").hasRole("CLIENT")
 
                         // el resto, autenticado

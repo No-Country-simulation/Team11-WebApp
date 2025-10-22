@@ -1,4 +1,4 @@
-/*package com.nocountry.pyme_creditos.services;
+package com.nocountry.pyme_creditos.services;
 
 import com.nocountry.pyme_creditos.dto.CreditApplicationRequestDTO;
 import com.nocountry.pyme_creditos.dto.CreditApplicationResponseDTO;
@@ -75,13 +75,12 @@ public class CreditApplicationService {
         application.setCreditStatus(CreditStatus.PENDING);
 
 
-      //  historyService.recordStatusChange(application, CreditStatus.SAVE, CreditStatus.PENDING, "Aplicación enviada");
+        historyService.recordStatusChange(application, CreditStatus.SAVE, CreditStatus.PENDING, "Aplicación enviada");
 
-// En updateApplicationStatus:
 
 
         // Registrar en historial (si tienes este servicio)
-        // historyService.recordStatusChange(application, CreditStatus.SAVE, CreditStatus.PENDING, "Aplicación enviada");
+         historyService.recordStatusChange(application, CreditStatus.SAVE, CreditStatus.PENDING, "Aplicación enviada");
 
         CreditApplication updatedApplication = creditApplicationRepository.save(application);
         log.info("Aplicación {} enviada exitosamente", applicationId);
@@ -142,7 +141,7 @@ public class CreditApplicationService {
         application.setCreditStatus(newStatus);
 
         // Registrar en historial
-       // historyService.recordStatusChange(application, previousStatus, newStatus, requestDTO.getComments());
+        historyService.recordStatusChange(application, previousStatus, newStatus, requestDTO.getComments());
         // historyService.recordStatusChange(application, previousStatus, newStatus, requestDTO.getComments());
 
         CreditApplication updatedApplication = creditApplicationRepository.save(application);
@@ -210,4 +209,4 @@ public class CreditApplicationService {
             case APPROVED, REJECTED, CANCELLED -> false; // Estados finales
         };
     }
-}*/
+}
