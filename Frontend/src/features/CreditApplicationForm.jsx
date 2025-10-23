@@ -9,13 +9,36 @@ const CreditApplicationForm = () => {
     defaultValues: formData
   });
 
-  const onSubmit = (data) => {
-    setFormData({ ...formData, ...data });
-    console.log({ ...formData, ...data });
-    if (currentStep < 4) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
+  const onSubmit = async (data) => {
+  const updatedData = { ...formData, ...data };
+  setFormData(updatedData);
+
+  if (currentStep < 4) {
+    setCurrentStep(currentStep + 1);
+    return;
+  }
+
+  // === Paso final (firma digital) ===
+  if (!updatedData.digitalSignature) {
+    setError('digitalSignature', {
+      type: 'manual',
+      message: 'Debe ingresar su contraseña de firma digital',
+    });
+    return;
+  }
+
+  // Si pasa la verificación, mostramos los datos completos
+  console.log("✅ Datos completos del formulario:", updatedData);
+  alert("Formulario completo capturado. Revisa la consola del navegador.");
+};
+
+
+  const verifyDigitalSignature = async (signature) => {
+  // Ejemplo: comparar con una firma fija o validar formato
+  // En producción: harías un fetch() a tu API
+  await new Promise((res) => setTimeout(res, 1000)); // Simula retardo
+  return signature === "1234"; // Ejemplo: clave válida
+};
 
   const handleBack = () => {
     if (currentStep > 1) {
@@ -422,14 +445,20 @@ const CreditApplicationForm = () => {
             <div>
               <label htmlFor="digitalSignature" className="block text-Green font-medium mb-2">
                 Adjuntar firma digital *
-              </label>
+              </label>{/* 
               <input
                 id="digitalSignature"
                 type="file"
                 accept=".pdf"
                 {...register('digitalSignature', { required: 'Este campo es obligatorio' })}
                 className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-              />
+              />*/}
+              <input 
+                id='digitalSignature'
+                type="password"
+                {...register('digitalSignature', { required: 'Este campo es obligatorio' })}
+                className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+               />
               {errors.digitalSignature && (
                 <span className="text-red-500 text-sm block">{errors.digitalSignature.message}</span>
               )}
