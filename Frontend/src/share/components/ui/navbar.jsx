@@ -190,7 +190,7 @@ const Navbar = ({ variant = "home" }) => {
                       {variant === "pyme" && (
                         <button
                           onClick={() => {
-                            navigate("/panel/cuenta");
+                            navigate("/panel/empresa");
                             setDropdownOpen(false);
                           }}
                           className="flex gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"

@@ -17,8 +17,10 @@ import PymeLayout from "../layouts/PymeLayout";
 import PymeHomePage from "../../features/pyme/pages/PymeHomePage";
 import PymeDocumentationPage from "../../features/pyme/pages/PymeDocumentationPage";
 import PymeCreditHistoryPage from "../../features/pyme/pages/PymeCreditHistoryPage";
+import PymeCompanyPanelPage from "../../features/pyme/pages/PymeCompanyPanelPage";
 import OperatorRequestsManagePage from "../../features/operator/pages/OperatorRequestsManagePage";
 import { ProtectedRoute } from "./ProtectedRoute";
+import { HasCompanyRoute } from "./HasCompanyRoute";
 
 export default function AppRoutes() {
   return (
@@ -39,16 +41,22 @@ export default function AppRoutes() {
       {/* --- Panel PYME (solo CLIENT) --- */}
       <Route element={<ProtectedRoute allowedRoles={["CLIENT"]} />}>
         <Route path="/panel" element={<PymeLayout />}>
-          <Route index element={<PymeHomePage />} />
-          <Route path="mis-solicitudes" element={<PymeRequestsLayout />}>
-            <Route index element={<Navigate to="pendientes" replace />} />
-            <Route path="pendientes" element={<PymeRequestsInReviewPage />} />
-            <Route path="aprobadas" element={<PymeRequestsApprovedPage />} />
-            <Route path="rechazadas" element={<PymeRequestsRejectedPage />} />
-            <Route path="guardadas" element={<PymeRequestsSavedPage />} />
+          <Route element={<HasCompanyRoute />}>
+            <Route index element={<PymeHomePage />} />
+            <Route path="mis-solicitudes" element={<PymeRequestsLayout />}>
+              <Route index element={<Navigate to="pendientes" replace />} />
+              <Route path="pendientes" element={<PymeRequestsInReviewPage />} />
+              <Route path="aprobadas" element={<PymeRequestsApprovedPage />} />
+              <Route path="rechazadas" element={<PymeRequestsRejectedPage />} />
+              <Route path="guardadas" element={<PymeRequestsSavedPage />} />
+            </Route>
+            <Route path="documentacion" element={<PymeDocumentationPage />} />
+            <Route
+              path="historial-credito"
+              element={<PymeCreditHistoryPage />}
+            />
           </Route>
-          <Route path="documentacion" element={<PymeDocumentationPage />} />
-          <Route path="historial-credito" element={<PymeCreditHistoryPage />} />
+          <Route path="empresa" element={<PymeCompanyPanelPage />} />
         </Route>
       </Route>
 

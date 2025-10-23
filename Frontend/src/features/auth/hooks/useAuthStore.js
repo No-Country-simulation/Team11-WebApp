@@ -14,7 +14,10 @@ export const useAuthStore = create(
       setAuth: ({ token, email, roles }) => {
         set({ token, email, roles: roles || [] });
       },
-      clearAuth: () => set({ ...initialState }),
+      clearAuth: () => {
+        set({ ...initialState })            
+        localStorage.clear();    
+      },
       getToken: () => get().token,
       isAuthenticated: () => Boolean(get().token),
     }),
