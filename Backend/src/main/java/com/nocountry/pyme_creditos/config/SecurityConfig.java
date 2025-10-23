@@ -4,6 +4,7 @@ package com.nocountry.pyme_creditos.config;
 import com.nocountry.pyme_creditos.security.JwtAuthenticationEntryPoint;
 import com.nocountry.pyme_creditos.security.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +19,12 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -30,9 +37,14 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationEntryPoint entryPoint; // @Component
 
+    @Value("${cors.allowed-origins}")
+    private String allowedOriginsProp;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> {})
+
                 // API stateless (sin cookies csrf)
                 .csrf(csrf -> csrf.disable())
 
@@ -44,12 +56,16 @@ public class SecurityConfig {
 
                 // Autorización por rutas
                 .authorizeHttpRequests(auth -> auth
+
                         // públicas
                         .requestMatchers(
                                 "/auth/login",
                                 "/auth/register",
                                 "/auth/operator/register",
-                                "/auth/.well-known/jwks.json"
+                                "/auth/.well-known/jwks.json",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
                         ).permitAll()
 
                         // ej. por rol (opcional, si es que lo vamos a usar)
@@ -79,5 +95,19 @@ public class SecurityConfig {
         // Al registrar un usuario, se debe usar este mismo encoder para cifrar su contraseña
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(allowedOriginsProp.split(",")));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "X-User-Id"));
+        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
 
 }

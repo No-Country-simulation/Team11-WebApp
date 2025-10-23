@@ -20,6 +20,9 @@ target/
 *.ipr
 **/.env
 .env.example
+# Claves JWT locales
+src/main/resources/keys/
+
 
 ### NetBeans ###
 /nbproject/private/

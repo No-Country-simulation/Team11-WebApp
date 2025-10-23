@@ -7,6 +7,10 @@ import com.nocountry.pyme_creditos.exceptions.UserAlreadyExistException;
 import com.nocountry.pyme_creditos.model.User;
 import com.nocountry.pyme_creditos.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +33,8 @@ public class UserService implements IUserService  {
     public UserResponseDto registerOperator(UserRequestDto dto) throws UserAlreadyExistException {
         return createUser(dto, Roles.OPERATOR);
     }
+
+
 
     private UserResponseDto createUser(UserRequestDto dto, Roles roles) throws UserAlreadyExistException {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
