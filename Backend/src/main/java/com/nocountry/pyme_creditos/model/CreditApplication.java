@@ -19,7 +19,7 @@ public class CreditApplication {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_application", updatable = false, nullable = false)
-    private UUID id; // ✅ CAMBIADO A UUID
+    private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "signature_id")
@@ -80,6 +80,6 @@ public class CreditApplication {
         this.requestedAmount = requestedAmount;
         this.termMonths = termMonths;
         this.applicationCheckbox = applicationCheckbox;
-        this.creditStatus = CreditStatus.SAVE;
+
     }
 }
