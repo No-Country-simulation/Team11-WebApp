@@ -1,4 +1,4 @@
-export default function OperatorRequestsApprovedPage() {
+export default function PymeRequestsApprovedPage() {
   return (
     <div className="overflow-x-auto text-text">
       <table className="min-w-full">

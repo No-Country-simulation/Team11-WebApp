@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 
-export default function OperatorRequestsLayout() {
+export default function PymeRequestsLayout() {
   const tabs = [
     { to: "pendientes", label: "En Revisión" },
     { to: "aprobadas", label: "Aprobada" },

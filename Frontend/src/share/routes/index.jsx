@@ -8,11 +8,11 @@ import OperatorLayout from "../layouts/OperatorLayout";
 import OperatorHomePage from "../../features/operator/pages/OperatorHomePage";
 import OperatorReportsPage from "../../features/operator/pages/OperatorReportsPage";
 import OperatorRequestsHistoryPage from "../../features/operator/pages/OperatorRequestsHistoryPage";
-import OperatorRequestsLayout from "../../features/operator/layouts/OperatorRequestsLayout";
-import OperatorRequestsInReviewPage from "../../features/operator/pages/requests/OperatorRequestsInReviewPage";
-import OperatorRequestsApprovedPage from "../../features/operator/pages/requests/OperatorRequestsApprovedPage";
-import OperatorRequestsRejectedPage from "../../features/operator/pages/requests/OperatorRequestsRejectedPage";
-import OperatorRequestsSavedPage from "../../features/operator/pages/requests/OperatorRequestsSavedPage";
+import PymeRequestsLayout from "../../features/pyme/layouts/PymeRequestsLayout";
+import PymeRequestsInReviewPage from "../../features/pyme/pages/requests/PymeRequestsInReviewPage";
+import PymeRequestsApprovedPage from "../../features/pyme/pages/requests/PymeRequestsApprovedPage";
+import PymeRequestsRejectedPage from "../../features/pyme/pages/requests/PymeRequestsRejectedPage";
+import PymeRequestsSavedPage from "../../features/pyme/pages/requests/PymeRequestsSavedPage";
 import PymeLayout from "../layouts/PymeLayout";
 import PymeHomePage from "../../features/pyme/pages/PymeHomePage";
 import PymeDocumentationPage from "../../features/pyme/pages/PymeDocumentationPage";
@@ -27,34 +27,25 @@ export default function AppRoutes() {
       <Route element={<HomeLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/nosotros" element={<AboutUsPage />} />
-        <Route path="/financiamiento" element={<FinancingPage />} />        
+        <Route path="/financiamiento" element={<FinancingPage />} />
       </Route>
-      
+
       <Route element={<HomeLayout />}>
         <Route path="/operador" element={<HomePage />} />
         <Route path="/operador/nosotros" element={<AboutUsPage />} />
-        <Route path="/operador/financiamiento" element={<FinancingPage />} />        
+        <Route path="/operador/financiamiento" element={<FinancingPage />} />
       </Route>
-            
+
       {/* --- Panel PYME (solo CLIENT) --- */}
       <Route element={<ProtectedRoute allowedRoles={["CLIENT"]} />}>
         <Route path="/panel" element={<PymeLayout />}>
           <Route index element={<PymeHomePage />} />
-          <Route path="mis-solicitudes" element={<OperatorRequestsLayout />}>
+          <Route path="mis-solicitudes" element={<PymeRequestsLayout />}>
             <Route index element={<Navigate to="pendientes" replace />} />
-            <Route
-              path="pendientes"
-              element={<OperatorRequestsInReviewPage />}
-            />
-            <Route
-              path="aprobadas"
-              element={<OperatorRequestsApprovedPage />}
-            />
-            <Route
-              path="rechazadas"
-              element={<OperatorRequestsRejectedPage />}
-            />
-            <Route path="guardadas" element={<OperatorRequestsSavedPage />} />
+            <Route path="pendientes" element={<PymeRequestsInReviewPage />} />
+            <Route path="aprobadas" element={<PymeRequestsApprovedPage />} />
+            <Route path="rechazadas" element={<PymeRequestsRejectedPage />} />
+            <Route path="guardadas" element={<PymeRequestsSavedPage />} />
           </Route>
           <Route path="documentacion" element={<PymeDocumentationPage />} />
           <Route path="historial-credito" element={<PymeCreditHistoryPage />} />
@@ -62,11 +53,7 @@ export default function AppRoutes() {
       </Route>
 
       {/* --- Panel OPERADOR (OPERATOR) --- */}
-      <Route
-        element={
-          <ProtectedRoute allowedRoles={["OPERATOR"]} />
-        }
-      >
+      <Route element={<ProtectedRoute allowedRoles={["OPERATOR"]} />}>
         <Route path="/operador/panel" element={<OperatorLayout />}>
           <Route index element={<OperatorHomePage />} />
           <Route
