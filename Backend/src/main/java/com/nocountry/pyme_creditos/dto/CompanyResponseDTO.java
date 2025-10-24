@@ -18,12 +18,6 @@ public class CompanyResponseDTO {
     private String companyEmail;
     private String businessSector;
     private Integer employeeCount;
-    private Double monthlyRevenue;
-    private Double monthlyExpenses;
-    private Integer companyYears;
-    private Double monthlyProfit;
-    private Boolean isProfitable;
-    private String companySize;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -38,13 +32,7 @@ public class CompanyResponseDTO {
         this.address = company.getAddress();
         this.companyEmail = company.getCompanyEmail();
         this.businessSector = company.getBusinessSector();
-        this.employeeCount = company.getEmployeeCount();
-        this.monthlyRevenue = company.getMonthlyRevenue();
-        this.monthlyExpenses = company.getMonthlyExpenses();
-        this.companyYears = company.getCompanyYears();
-        this.monthlyProfit = company.calculateMonthlyProfit();
-        this.isProfitable = company.isProfitable();
-        this.companySize = company.getCompanySize();
+        this.employeeCount= company.getEmployeeCount();
         this.createdAt = company.getCreatedAt();
         this.updatedAt = company.getUpdatedAt();
     }
