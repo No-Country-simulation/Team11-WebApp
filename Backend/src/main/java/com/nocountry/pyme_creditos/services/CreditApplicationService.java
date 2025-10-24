@@ -9,6 +9,7 @@ import com.nocountry.pyme_creditos.enums.CreditStatus;
 import com.nocountry.pyme_creditos.enums.CreditType;
 import com.nocountry.pyme_creditos.repository.CreditApplicationRepository;
 import com.nocountry.pyme_creditos.repository.CompanyRepository;
+import com.nocountry.pyme_creditos.security.SecurityUtils;
 import com.nocountry.pyme_creditos.services.ApplicationHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,25 +29,34 @@ public class CreditApplicationService {
     private final CreditApplicationRepository creditApplicationRepository;
     private final CompanyRepository companyRepository;
     private final ApplicationHistoryService historyService; // Para auditoría
+    private final SecurityUtils securityUtils;
+    private final CompanyService companyService;
+
 
     // ✅ CREATE - Crear nueva aplicación (estado SAVE)
     public CreditApplicationResponseDTO createApplication(CreditApplicationRequestDTO requestDTO) {
-        log.info("Creando nueva aplicación de crédito para company: {}", requestDTO.getCompanyId());
+        // Obtener usuario logueado
+        UUID userId = securityUtils.getCurrentUserId();
 
-        Company company = companyRepository.findById(requestDTO.getCompanyId())
-                .orElseThrow(() -> new RuntimeException("Compañía no encontrada con ID: " + requestDTO.getCompanyId()));
+        // Obtener la compañía asociada al usuario
+        Company company = companyService.getMyCompanyEntity(userId);
+
 
         // Validar que no tenga aplicaciones pendientes del mismo tipo
         if (creditApplicationRepository.existsPendingApplicationOfType(company.getId(), requestDTO.getCreditType())) {
             throw new IllegalStateException("Ya existe una aplicación pendiente del mismo tipo para esta compañía");
         }
 
+        // Crear la aplicación
         CreditApplication application = new CreditApplication();
-        application.setCompany(company);
+        application.setCompany(company); // <-- asignar compañía aquí
         application.setCreditType(requestDTO.getCreditType());
         application.setDescription(requestDTO.getDescription());
         application.setRequestedAmount(requestDTO.getRequestedAmount());
         application.setTermMonths(requestDTO.getTermMonths());
+        application.setMonthlyRevenue(requestDTO.getMonthlyRevenue());
+        application.setMonthlyExpenses(requestDTO.getMonthlyExpenses());
+        application.setCompanyYears(requestDTO.getCompanyYears());
         application.setApplicationCheckbox(requestDTO.getApplicationCheckbox());
         application.setCreditStatus(CreditStatus.SAVE); // Estado inicial como borrador
 

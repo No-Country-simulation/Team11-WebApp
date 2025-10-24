@@ -4,6 +4,8 @@ import com.nocountry.pyme_creditos.dto.CreditApplicationRequestDTO;
 import com.nocountry.pyme_creditos.dto.CreditApplicationResponseDTO;
 import com.nocountry.pyme_creditos.dto.StatusUpdateRequestDTO;
 import com.nocountry.pyme_creditos.enums.CreditStatus;
+import com.nocountry.pyme_creditos.security.SecurityUtils;
+import com.nocountry.pyme_creditos.services.CompanyService;
 import com.nocountry.pyme_creditos.services.CreditApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +24,18 @@ import java.util.UUID;
 public class CreditApplicationController {
 
     private final CreditApplicationService creditApplicationService;
+    private final SecurityUtils securityUtils;
+    private final CompanyService companyService;
 
     // ✅ CREATE - Cliente crea aplicación (estado SAVE)
     @PostMapping
     public ResponseEntity<CreditApplicationResponseDTO> createApplication(
             @Valid @RequestBody CreditApplicationRequestDTO requestDTO) {
+
+        // ✅ Obtenemos el usuario autenticado
+        UUID userId = securityUtils.getCurrentUserId();
+
+
 
         CreditApplicationResponseDTO response = creditApplicationService.createApplication(requestDTO);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -41,15 +50,39 @@ public class CreditApplicationController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ GET - Cliente ve SUS aplicaciones
-    @GetMapping("/my-applications")
-    public ResponseEntity<List<CreditApplicationResponseDTO>> getMyApplications() {
-        // Necesitarías implementar este método en el servicio
-        // List<CreditApplicationResponseDTO> responses = creditApplicationService.getMyApplications();
-        return ResponseEntity.ok().build();
+    // 🟢 GET - Cliente ve todas las aplicaciones de SU compañía
+    @GetMapping("/company")
+    public ResponseEntity<List<CreditApplicationResponseDTO>> getCompanyApplications() {
+        UUID companyId = getCompanyIdFromAuthenticatedUser();
+        List<CreditApplicationResponseDTO> responses = creditApplicationService.getApplicationsByCompany(companyId);
+        return ResponseEntity.ok(responses);
     }
 
-    // ✅ GET - Operador ve TODAS las aplicaciones PENDIENTES
+
+    private UUID getCompanyIdFromAuthenticatedUser() {
+        UUID userId = securityUtils.getCurrentUserId();
+        return companyService.getMyCompany(userId).getId();
+    }
+
+    // ✅ PUT - Cliente actualiza su aplicación (solo en estado SAVE)
+    @PutMapping("/{id}")
+    public ResponseEntity<CreditApplicationResponseDTO> updateApplication(
+            @PathVariable UUID id,
+            @Valid @RequestBody CreditApplicationRequestDTO requestDTO) {
+
+        CreditApplicationResponseDTO response = creditApplicationService.updateApplication(id, requestDTO);
+        return ResponseEntity.ok(response);
+    }
+
+    // ✅ DELETE - Cliente elimina su aplicación (solo en estado SAVE)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteApplication(@PathVariable UUID id) {
+
+        creditApplicationService.deleteApplication(id);
+        return ResponseEntity.noContent().build();
+    }
+
+  /*  // ✅ GET - Operador ve TODAS las aplicaciones PENDIENTES
     @GetMapping("/pending")
     @PreAuthorize("hasRole('OPERATOR')") // Solo operadores
     public ResponseEntity<List<CreditApplicationResponseDTO>> getPendingApplications() {
@@ -94,32 +127,16 @@ public class CreditApplicationController {
 
         List<CreditApplicationResponseDTO> responses = creditApplicationService.getApplicationsForReview();
         return ResponseEntity.ok(responses);
-    }
+    }*/
 
-    // ✅ PUT - Cliente actualiza su aplicación (solo en estado SAVE)
-    @PutMapping("/{id}")
-    public ResponseEntity<CreditApplicationResponseDTO> updateApplication(
-            @PathVariable UUID id,
-            @Valid @RequestBody CreditApplicationRequestDTO requestDTO) {
 
-        CreditApplicationResponseDTO response = creditApplicationService.updateApplication(id, requestDTO);
-        return ResponseEntity.ok(response);
-    }
 
-    // ✅ DELETE - Cliente elimina su aplicación (solo en estado SAVE)
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteApplication(@PathVariable UUID id) {
-
-        creditApplicationService.deleteApplication(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    // ✅ GET - Cliente ve aplicaciones por compañía
+    /*// ✅ GET - Cliente ve aplicaciones por compañía
     @GetMapping("/company/{companyId}")
     public ResponseEntity<List<CreditApplicationResponseDTO>> getApplicationsByCompany(
             @PathVariable UUID companyId) {
 
         List<CreditApplicationResponseDTO> responses = creditApplicationService.getApplicationsByCompany(companyId);
         return ResponseEntity.ok(responses);
-    }
+    }*/
 }

@@ -24,8 +24,8 @@ public class Company {
     private UUID id; // ✅ UUID con nueva sintaxis
 
     // Relación con User (propietario)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
     // Información legal
@@ -49,15 +49,6 @@ public class Company {
     @Column(name = "employee_count", nullable = false)
     private Integer employeeCount;
 
-    // Información financiera
-    @Column(name = "monthly_revenue", nullable = false)
-    private Double monthlyRevenue;
-
-    @Column(name = "monthly_expenses", nullable = false)
-    private Double monthlyExpenses;
-
-    @Column(name = "company_years", nullable = false)
-    private Integer companyYears;
 
     @OneToMany(mappedBy = "company",  cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
@@ -85,8 +76,7 @@ public class Company {
     // Constructor para fácil creación
     public Company(User user, String legalName, String taxIdentification,
                    String address, String companyEmail, String businessSector,
-                   Integer employeeCount, Double monthlyRevenue, Double monthlyExpenses,
-                   Integer companyYears) {
+                   Integer employeeCount) {
         this.user = user;
         this.legalName = legalName;
         this.taxIdentification = taxIdentification;
@@ -94,21 +84,11 @@ public class Company {
         this.companyEmail = companyEmail;
         this.businessSector = businessSector;
         this.employeeCount = employeeCount;
-        this.monthlyRevenue = monthlyRevenue;
-        this.monthlyExpenses = monthlyExpenses;
-        this.companyYears = companyYears;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
-    // Métodos de negocio
-    public Double calculateMonthlyProfit() {
-        return this.monthlyRevenue - this.monthlyExpenses;
-    }
 
-    public boolean isProfitable() {
-        return calculateMonthlyProfit() > 0;
-    }
 
     public String getCompanySize() {
         if (employeeCount <= 10) {
