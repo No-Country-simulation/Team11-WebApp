@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FileText, ArrowLeft, SquarePen } from 'lucide-react';
 
 const CreditApplicationForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({});
+  const [timer, setTimer] = useState(0);
   const { register, handleSubmit, formState: { errors }, watch } = useForm({
     defaultValues: formData
   });
@@ -13,8 +14,14 @@ const CreditApplicationForm = () => {
   const updatedData = { ...formData, ...data };
   setFormData(updatedData);
 
-  if (currentStep < 4) {
+  if (currentStep < 3) {
     setCurrentStep(currentStep + 1);
+    return;
+  }
+
+  if (currentStep === 3) {
+    setCurrentStep(4);
+    setTimer(120); 
     return;
   }
 
@@ -55,6 +62,22 @@ const CreditApplicationForm = () => {
       default: return '';
     }
   };
+
+  useEffect(() => {
+  let countdown;
+
+  if (currentStep === 4 && timer > 0) {
+    countdown = setInterval(() => {
+      setTimer((prev) => prev - 1);
+    }, 1000);
+  }
+
+  if (currentStep === 4 && timer === 0) {
+    setCurrentStep(3); 
+  }
+
+  return () => clearInterval(countdown);
+}, [currentStep, timer]);
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -444,7 +467,7 @@ const CreditApplicationForm = () => {
           <>
             <div>
               <label htmlFor="digitalSignature" className="block text-Green font-medium mb-2">
-                Adjuntar firma digital *
+                Ingrese su Contraseña *
               </label>{/* 
               <input
                 id="digitalSignature"
@@ -462,7 +485,7 @@ const CreditApplicationForm = () => {
               {errors.digitalSignature && (
                 <span className="text-red-500 text-sm block">{errors.digitalSignature.message}</span>
               )}
-              <p className="text-sm text-gray-600 mt-1">Formato PDF.</p>
+              <p className="text-sm text-gray-600 mt-1">Ingrese su contraseña (Tiene {timer} segundos).</p>
             </div>
           </>
         )}
