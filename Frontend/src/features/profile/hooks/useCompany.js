@@ -18,9 +18,9 @@ export const useCompany = () => {
 
       try {
         const response = await getCompanyProfile();
-
-        if (Array.isArray(response) && response.length > 0) {
-          setCompany(response[0]);
+        
+        if (response && typeof response === "object") {
+          setCompany(response);
         } else {
           clearCompany();
         }
@@ -52,8 +52,9 @@ export const useCompany = () => {
       setError(null);
       try {
         const response = await getCompanyProfile();
-        if (Array.isArray(response) && response.length > 0) {
-          setCompany(response[0]);
+        
+        if (response && typeof response === "object") {
+          setCompany(response);
         } else {
           clearCompany();
         }

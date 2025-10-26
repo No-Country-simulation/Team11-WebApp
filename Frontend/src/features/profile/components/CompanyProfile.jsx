@@ -10,7 +10,7 @@ const CompanyProfile = () => {
     register,
     handleSubmit,
     formState: { errors },
-    setValue
+    setValue,
   } = useForm();
   const [bankAccounts, setBankAccounts] = useState([{ id: 1 }]);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,9 +25,6 @@ const CompanyProfile = () => {
       setValue("companyEmail", company.companyEmail);
       setValue("activity", company.businessSector);
       setValue("employeeCount", company.employeeCount);
-      setValue("monthlyRevenue", company.monthlyRevenue);
-      setValue("monthlyExpenses", company.monthlyExpenses);
-      setValue("seniority", company.companyYears);
 
       if (company.bankAccounts && company.bankAccounts.length > 0) {
         setValue("bankAccounts", company.bankAccounts);
@@ -42,15 +39,13 @@ const CompanyProfile = () => {
 
       // Mapear los datos del formulario al formato del endpoint
       const companyData = {
+        id: company?.id, // Incluir el ID si existe para actualización
         legalName: data.businessName,
         taxIdentification: data.taxId,
         address: data.address,
-        companyEmail: data.companyEmail || "", // Agregar campo si no existe
+        companyEmail: data.companyEmail || "",
         businessSector: data.activity,
         employeeCount: parseInt(data.employeeCount) || 0,
-        monthlyRevenue: parseFloat(data.monthlyRevenue) || 0,
-        monthlyExpenses: parseFloat(data.monthlyExpenses) || 0,
-        companyYears: parseInt(data.seniority) || 0,
       };
 
       const response = await createOrUpdateCompany(companyData);
@@ -75,7 +70,9 @@ const CompanyProfile = () => {
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-2xl text-Green font-bold mb-6">
-        Para poder operar, necesitamos que completes tu perfil
+        {company
+          ? "Actualizar perfil de empresa"
+          : "Para poder operar, necesitamos que completes tu perfil"}
       </h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -201,40 +198,6 @@ const CompanyProfile = () => {
 
         <div>
           <label
-            htmlFor="seniority"
-            className="block text-Green font-medium mb-2"
-          >
-            Antigüedad (años)
-          </label>
-          <input
-            id="seniority"
-            type="number"
-            {...register("seniority", {
-              required: "La antigüedad es obligatoria",
-              min: {
-                value: 0,
-                message: "La antigüedad no puede ser negativa",
-              },
-              max: {
-                value: 100,
-                message: "La antigüedad no puede exceder 100 años",
-              },
-            })}
-            min="0"
-            max="100"
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-Green ${
-              errors.seniority ? "border-red-500" : "text-Green"
-            }`}
-          />
-          {errors.seniority && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.seniority.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label
             htmlFor="companyEmail"
             className="block text-Green font-medium mb-2"
           >
@@ -257,74 +220,6 @@ const CompanyProfile = () => {
           {errors.companyEmail && (
             <p className="text-red-500 text-sm mt-1">
               {errors.companyEmail.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label
-            htmlFor="monthlyRevenue"
-            className="block text-Green font-medium mb-2"
-          >
-            Ingresos mensuales
-          </label>
-          <input
-            id="monthlyRevenue"
-            type="number"
-            step="0.01"
-            {...register("monthlyRevenue", {
-              required: "Los ingresos mensuales son obligatorios",
-              min: {
-                value: 0,
-                message: "Los ingresos no pueden ser negativos",
-              },
-              max: {
-                value: 999999999999,
-                message: "Los ingresos exceden el límite permitido",
-              },
-            })}
-            min="0"
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-Green ${
-              errors.monthlyRevenue ? "border-red-500" : "text-Green"
-            }`}
-          />
-          {errors.monthlyRevenue && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.monthlyRevenue.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label
-            htmlFor="monthlyExpenses"
-            className="block text-Green font-medium mb-2"
-          >
-            Gastos mensuales
-          </label>
-          <input
-            id="monthlyExpenses"
-            type="number"
-            step="0.01"
-            {...register("monthlyExpenses", {
-              required: "Los gastos mensuales son obligatorios",
-              min: {
-                value: 0,
-                message: "Los gastos no pueden ser negativos",
-              },
-              max: {
-                value: 999999999999,
-                message: "Los gastos exceden el límite permitido",
-              },
-            })}
-            min="0"
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-Green ${
-              errors.monthlyExpenses ? "border-red-500" : "text-Green"
-            }`}
-          />
-          {errors.monthlyExpenses && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.monthlyExpenses.message}
             </p>
           )}
         </div>
@@ -439,10 +334,10 @@ const CompanyProfile = () => {
           </button>
           <button
             type="submit"
-            disabled={isLoading || company}
+            disabled={isLoading}
             className="px-6 py-2 bg-DarkViolet cursor-pointer text-white rounded-lg font-medium hover:bg-Violet transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Guardando..." : "Confirmar"}
+            {isLoading ? "Guardando..." : company ? "Actualizar" : "Confirmar"}
           </button>
         </div>
       </form>
