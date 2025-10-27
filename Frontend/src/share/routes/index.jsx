@@ -21,6 +21,7 @@ import PymeCompanyPanelPage from "../../features/pyme/pages/PymeCompanyPanelPage
 import OperatorRequestsManagePage from "../../features/operator/pages/OperatorRequestsManagePage";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { HasCompanyRoute } from "./HasCompanyRoute";
+import { PymeRequestCreate } from "../../features/pyme/pages/PymeRequestCreate";
 
 export default function AppRoutes() {
   return (
@@ -50,6 +51,7 @@ export default function AppRoutes() {
               <Route path="rechazadas" element={<PymeRequestsRejectedPage />} />
               <Route path="guardadas" element={<PymeRequestsSavedPage />} />
             </Route>
+            <Route path="crear-solicitud" element={<PymeRequestCreate />} />
             <Route path="documentacion" element={<PymeDocumentationPage />} />
             <Route
               path="historial-credito"

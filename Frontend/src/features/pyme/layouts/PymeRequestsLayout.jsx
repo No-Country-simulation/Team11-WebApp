@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
 export default function PymeRequestsLayout() {
   const tabs = [
@@ -8,10 +8,15 @@ export default function PymeRequestsLayout() {
     { to: "guardadas", label: "Guardadas" },
   ];
 
+  const navigate = useNavigate();
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between">
-        <button className="px-4 sm:px-6 py-1 sm:py-2 bg-secondary text-white font-extrabold text-xl rounded-4xl shadow-[0px_4px_4px_rgba(0,0,0,0.25)] cursor-pointer">
+        <button
+          onClick={() => navigate("/panel/crear-solicitud")}
+          className="px-4 sm:px-6 py-1 sm:py-2 bg-secondary text-white font-extrabold text-xl rounded-4xl shadow-[0px_4px_4px_rgba(0,0,0,0.25)] cursor-pointer"
+        >
           Solicita tu crédito ahora
         </button>
       </div>

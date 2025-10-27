@@ -11,9 +11,9 @@ export default function HomePage() {
           className="w-full h-[220px] sm:h-[280px] md:h-[340px] lg:h-[380px] object-cover"
         />
         <div className="absolute inset-x-0 -bottom-5 flex justify-center">
-          <button className="px-6 sm:px-8 py-2 sm:py-3 bg-secondary text-white font-extrabold text-3xl rounded-4xl shadow-[0px_4px_4px_rgba(0,0,0,0.25)] cursor-pointer">
+          <div className="px-6 sm:px-8 py-2 sm:py-3 bg-secondary text-white font-extrabold text-3xl rounded-4xl shadow-[0px_4px_4px_rgba(0,0,0,0.25)] cursor-pointer">
             Solicita tu crédito ahora
-          </button>
+          </div>
         </div>
       </section>
 

@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
 export default function PymeHomePage() {
+  const navigate = useNavigate();
   return (
     <div className="w-full bg-primary">
       <div className="grid md:grid-cols-12 items-stretch max-w-7xl mx-auto">
@@ -11,9 +14,12 @@ export default function PymeHomePage() {
         </div>
 
         <aside className="bg-primary p-4 md:p-6 flex flex-col justify-center gap-6 md:col-span-5">
-          <div className="bg-secondary text-white text-center font-extrabold rounded-4xl py-3 px-4 text-4xl shadow-[0_4px_4px_0_#00000040]">
+          <button
+            onClick={() => navigate("/panel/crear-solicitud")}
+            className="bg-secondary text-white text-center font-extrabold rounded-4xl py-3 px-4 text-4xl shadow-[0_4px_4px_0_#00000040] hover:cursor-pointer"
+          >
             Solicita tu crédito ahora
-          </div>
+          </button>
 
           <div className="bg-white text-center font-bold text-2xl text-text rounded-xl shadow-[0_0_4px_0_#33333380] border border-secondary p-4">
             100% Seguro
