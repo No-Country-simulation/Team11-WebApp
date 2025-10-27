@@ -21,11 +21,33 @@ public class DigitalSignature {
     @Column(name = "id_signature", updatable = false, nullable = false)
     private UUID id;
 
+    // Firma vinculada a una aplicación de crédito
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "application_id", nullable = false)
+    private CreditApplication application;
+
+    /**
     // Relación UNO-a-UNO con User (cada usuario tiene UNA firma)
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", unique = true, nullable = false)
-    private Company company;
+    private Company company;*/
 
+    // Usuario que firmó (representante de la empresa)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(name = "provider", nullable = false)
+    private String provider; // "MOCK" o "DOCUSIGN"
+
+    @Column(name = "envelope_id", unique = true)
+    private String envelopeId;
+
+    @Column(name = "signing_url")
+    private String signingUrl;
+
+    @Column(name = "status", nullable = false)
+    private String status = "created"; // created, sent, completed, failed
 
 
     // Documento de firma (podría ser PDF, imagen, etc.)
@@ -36,12 +58,25 @@ public class DigitalSignature {
     @Column(name = "createdAt", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Constructor para fácil creación
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
+
+    /* Constructor para fácil creación
     public DigitalSignature(Company company, String signatureDocument) {
         this.company = company;
         this.signatureDocument = signatureDocument;
         this.createdAt = LocalDateTime.now();
+    }*/
+
+    // Constructor para fácil creación
+    public DigitalSignature(CreditApplication application, User user, String provider) {
+        this.application = application;
+        this.user = user;
+        this.provider = provider;
+        this.status = "created";
+        this.createdAt = LocalDateTime.now();
     }
+
 
     // Metodo para actualizar timestamp si es necesario
     @PrePersist
