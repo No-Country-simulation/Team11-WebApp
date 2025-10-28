@@ -5,7 +5,9 @@ import {
   createCreditApplication,
   submitCreditApplication,
 } from "../services/credit-application";
+import { uploadDocuments } from "../services/documents";
 import { toast } from "sonner";
+import { getDocumentTypeFromFile } from "../helpers/DocumentType";
 
 const CreditApplicationForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -68,14 +70,49 @@ const CreditApplicationForm = () => {
         applicationCheckbox: true,
       };
 
-      // Crear la aplicación
+      // 1. Crear la aplicación de crédito
+      toast.loading("Creando solicitud de crédito...");
       const response = await createCreditApplication(submitData);
+      toast.dismiss();
+      toast.success("✅ Solicitud de crédito creada exitosamente");
 
-      // Si la creación fue exitosa, enviar la aplicación
       if (response.id) {
-        await submitCreditApplication(response.id);
-        toast.success("Solicitud de crédito enviada exitosamente");
-        console.log("✅ Solicitud enviada:", response);
+        const applicationId = response.id;
+
+        // 2. Subir documentos si existen
+        if (applicationData.documents && applicationData.documents.length > 0) {
+          try {
+            toast.loading("Subiendo documentos...");
+          
+            // Convertir FileList a Array y mapear tipos
+            const filesArray = Array.from(applicationData.documents);
+            const documentTypes = filesArray.map(file => 
+              getDocumentTypeFromFile(file)
+            );
+  
+            console.log("Subiendo documentos:", {
+              files: filesArray.map(f => f.name),
+              types: documentTypes
+            });
+  
+            await uploadDocuments(applicationId, filesArray, documentTypes);
+            
+            toast.dismiss();
+            toast.success(`✅ ${filesArray.length} documento(s) subido(s) exitosamente`);
+          } catch (uploadError) {
+            console.error("Error al subir documentos:", uploadError);
+            toast.error("⚠️ Solicitud creada pero hubo un error al subir algunos documentos");
+            // Continuamos aunque falle la subida de documentos
+          }
+        }
+
+        // 3. Enviar la aplicación (cambiar estado a PENDING)
+        toast.loading("Enviando solicitud...");
+        await submitCreditApplication(applicationId);
+        toast.dismiss();
+        toast.success("🎉 Solicitud de crédito enviada exitosamente");
+
+        console.log("✅ Solicitud completa enviada:", response);
 
         // Resetear el formulario
         setFormData({});
@@ -83,13 +120,15 @@ const CreditApplicationForm = () => {
       }
     } catch (error) {
       console.error("Error al enviar la solicitud:", error);
+      toast.dismiss();
       toast.error(
-        "Error al enviar la solicitud. Por favor, intente nuevamente."
+        "❌ Error al enviar la solicitud. Por favor, intente nuevamente."
       );
     } finally {
       setIsSubmitting(false);
     }
   };
+
 
   const handleBack = () => {
     if (currentStep > 1) {
@@ -410,7 +449,7 @@ const CreditApplicationForm = () => {
               <p className="text-sm text-gray-600 mt-1">Ejemplo: 5 años</p>
             </div>
 
-            {/* Campo de documentación agregado - solo en frontend por ahora */}
+            {/* Campo de documentación */}
             <div>
               <label
                 htmlFor="documents"
@@ -637,9 +676,9 @@ const CreditApplicationForm = () => {
             {isSubmitting
               ? "Enviando..."
               : currentStep === 3
-              ? "Enviar Solicitud"
+              ? "Guardar Solicitud"
               : currentStep === 4
-              ? "Confirmar y finalizar"
+              ? "Enviar Solicitud"
               : "Guardar y Continuar"}
           </button>
         </div>
