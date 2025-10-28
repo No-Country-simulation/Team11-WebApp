@@ -22,11 +22,9 @@ public class DocusignWebhookController {
     @PostMapping
     public ResponseEntity<String> markCompleted(@RequestBody Map<String, Object> body) {
         String envelopeId = (String) body.get("envelopeId");
-        String status = (String) body.getOrDefault("status", "completed");
+        String documentRef = (String) body.getOrDefault("documentRef", null);
 
-        signatureService.markCompleted(envelopeId);
-        log.info("✅ Firma mock completada: envelope {}", envelopeId);
-
+        signatureService.markCompleted(envelopeId, documentRef);
         return ResponseEntity.ok("OK");
     }
 }

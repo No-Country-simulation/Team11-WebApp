@@ -51,7 +51,7 @@ public class DigitalSignature {
 
 
     // Documento de firma (podría ser PDF, imagen, etc.)
-    @Column(name = "signature_document", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "signature_document", columnDefinition = "TEXT")
     private String signatureDocument; // Puede ser Base64, URL, o path al archivo
 
     // Fecha de creación

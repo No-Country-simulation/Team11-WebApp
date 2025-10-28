@@ -1,6 +1,5 @@
 package com.nocountry.pyme_creditos.services;
 
-import com.nocountry.pyme_creditos.dto.DigitalSignatureRequestDTO;
 import com.nocountry.pyme_creditos.dto.DigitalSignatureResponseDTO;
 import com.nocountry.pyme_creditos.model.DigitalSignature;
 import com.nocountry.pyme_creditos.repository.CreditApplicationRepository;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,22 +24,17 @@ public class DigitalSignatureService {
     private final DocusignClient docusignClient;
 
     @Transactional
-    public DigitalSignatureResponseDTO createSignatureMock(DigitalSignatureRequestDTO req) {
-        var app = appRepo.findById(req.getApplicationId())
+    public DigitalSignatureResponseDTO createSignatureMock(UUID appId, UUID userId) {
+        var app = appRepo.findById(appId)
                 .orElseThrow(() -> new IllegalArgumentException("Solicitud de crédito no encontrada"));
-        var user = userRepo.findById(req.getUserId())
+        var user = userRepo.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        //Crear registro inicial en BD
-        var sig = new DigitalSignature();
-        sig.setCompany(app.getCompany());
-        sig.setApplication(app);
-        sig.setUser(user);
-        sig.setProvider("MOCK");
-        sig.setStatus("created");
+        // Crear registro (status created)
+        var sig = new DigitalSignature(app, user, "MOCK");
         sigRepo.save(sig);
 
-        //Simular sesión de firma
+        // Simular sesión de firma y actualizar (status sent)
         var session = docusignClient.createEmbeddedSigning(
                 user.getName() + " " + user.getLastName(),
                 user.getEmail(),
@@ -51,24 +46,26 @@ public class DigitalSignatureService {
         sig.setStatus("sent");
         sigRepo.save(sig);
 
-        log.info("🖋️ Firma simulada creada para usuario {}", user.getEmail());
-
         return DigitalSignatureResponseDTO.builder()
                 .signatureId(sig.getId())
                 .envelopeId(sig.getEnvelopeId())
-                .provider(sig.getProvider())
                 .signingUrl(sig.getSigningUrl())
                 .status(sig.getStatus())
+                .provider(sig.getProvider())
                 .build();
     }
 
     @Transactional
-    public void markCompleted(String envelopeId) {
-        sigRepo.findByEnvelopeId(envelopeId).ifPresent(sig -> {
-            sig.setStatus("completed");
-            sig.setCompletedAt(LocalDateTime.now());
-            sigRepo.save(sig);
-        });
+    public void markCompleted(String envelopeId, String documentRef) {
+        var sig = sigRepo.findByEnvelopeId(envelopeId)
+                .orElseThrow(() -> new IllegalArgumentException("Envelope no encontrado: " + envelopeId));
+
+        sig.setStatus("completed");
+        sig.setCompletedAt(LocalDateTime.now());
+        if (documentRef != null && !documentRef.isBlank()) {
+            sig.setSignatureDocument(documentRef);
+        }
+        sigRepo.save(sig);
     }
 }
 

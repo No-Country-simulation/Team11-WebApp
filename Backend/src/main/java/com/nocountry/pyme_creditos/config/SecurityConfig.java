@@ -65,7 +65,8 @@ public class SecurityConfig {
                                 "/auth/.well-known/jwks.json",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/webhooks/**"
                         ).permitAll()
                         // 👨‍💼 RUTAS SOLO PARA OPERADORES
                         .requestMatchers(
