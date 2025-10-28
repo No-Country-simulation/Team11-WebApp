@@ -1,14 +1,31 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useCreditApplicationsStore } from "../store/useCreditApplicationsStore";
+import { useEffect } from "react";
 
 export default function PymeRequestsLayout() {
   const tabs = [
-    { to: "pendientes", label: "En Revisión" },
-    { to: "aprobadas", label: "Aprobada" },
-    { to: "rechazadas", label: "Rechazada" },
-    { to: "guardadas", label: "Guardadas" },
+    { to: "pendientes", label: "En Revisión", status: "PENDING" },
+    { to: "aprobadas", label: "Aprobada", status: "APPROVED" },
+    { to: "rechazadas", label: "Rechazada", status: "REJECTED" },
+    { to: "guardadas", label: "Guardadas", status: "SAVE" },
   ];
 
   const navigate = useNavigate();
+  const {
+    loading,
+    fetchApplications,
+    setFilters,
+  } = useCreditApplicationsStore();
+
+  // Cargar aplicaciones al montar el componente
+  useEffect(() => {
+    fetchApplications();
+  }, [fetchApplications]);
+
+  // Función para manejar el cambio de pestaña
+  const handleTabChange = (status) => {
+    setFilters({ status });
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -34,6 +51,7 @@ export default function PymeRequestsLayout() {
                   : "hover:text-secondary text-text"
               }`
             }
+            onClick={() => handleTabChange(tab.status)}
           >
             {tab.label}
           </NavLink>
