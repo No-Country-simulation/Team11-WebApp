@@ -21,6 +21,10 @@ public class Document {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "id_document", updatable = false, nullable = false)
 	private UUID id;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User uploadedBy;
 	
 	//Relacion con CreditApplication
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -35,7 +39,7 @@ public class Document {
 	private String fileUrl;
 	
 	@Column(name = "document_uploaded_at", nullable = false)
-	private LocalDateTime documentUploadeddAt = LocalDateTime.now();
+	private LocalDateTime documentUploadedAt = LocalDateTime.now();
 	
 	@Column(name = "is_valid", nullable = false)
 	private boolean isValid = false;

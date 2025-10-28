@@ -49,7 +49,7 @@ public class EntitiesUnitTest {
         doc.setApplication(app);
         doc.setDocumentType(DocumentType.BALANCE_SHEET);
         doc.setFileUrl("/docs/id.pdf");
-        doc.setDocumentUploadeddAt(LocalDateTime.now());
+        doc.setDocumentUploadedAt(LocalDateTime.now());
         doc.setValid(true);
         doc.setSigned(false);
 

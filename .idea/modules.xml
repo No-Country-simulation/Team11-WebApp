@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ProjectModuleManager">
-    <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Team11-WebApp.iml" filepath="$PROJECT_DIR$/.idea/Team11-WebApp.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Backend/pyme-creditos.iml" filepath="$PROJECT_DIR$/Backend/pyme-creditos.iml" />
-    </modules>
-  </component>
-</project>
