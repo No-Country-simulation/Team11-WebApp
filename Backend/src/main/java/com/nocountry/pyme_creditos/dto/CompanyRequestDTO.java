@@ -33,16 +33,4 @@ public class CompanyRequestDTO {
     @Max(value = 10000, message = "Número de empleados no puede exceder 10000")
     private Integer employeeCount;
 
-    @NotNull(message = "Ingresos mensuales son requeridos")
-    @PositiveOrZero(message = "Ingresos mensuales deben ser mayor o igual a 0")
-    private Double monthlyRevenue;
-
-    @NotNull(message = "Gastos mensuales son requeridos")
-    @PositiveOrZero(message = "Gastos mensuales deben ser mayor o igual a 0")
-    private Double monthlyExpenses;
-
-    @NotNull(message = "Años de operación son requeridos")
-    @Min(value = 0, message = "Años de operación debe ser mayor o igual a 0")
-    @Max(value = 200, message = "Años de operación no puede exceder 200")
-    private Integer companyYears;
 }
