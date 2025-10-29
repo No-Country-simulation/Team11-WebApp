@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class DocusignClient {
+public class DocuSignClient {
 
     @Value("${docusign.mode:MOCK}")
     private String mode;

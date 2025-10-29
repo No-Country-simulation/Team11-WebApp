@@ -21,7 +21,7 @@ public class DigitalSignatureService {
     private final CreditApplicationRepository appRepo;
     private final UserRepository userRepo;
     private final DigitalSignatureRepository sigRepo;
-    private final DocusignClient docusignClient;
+    private final DocuSignClient docusignClient;
 
     @Transactional
     public DigitalSignatureResponseDTO createSignatureMock(UUID appId, UUID userId) {
