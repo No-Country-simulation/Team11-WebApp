@@ -23,6 +23,10 @@ target/
 # Claves JWT locales
 src/main/resources/keys/
 
+# Archivos subidos por la app
+Backend/uploads/
+
+
 
 ### NetBeans ###
 /nbproject/private/
