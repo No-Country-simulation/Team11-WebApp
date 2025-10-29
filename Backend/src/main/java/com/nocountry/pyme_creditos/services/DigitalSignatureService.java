@@ -21,7 +21,7 @@ public class DigitalSignatureService {
     private final CreditApplicationRepository appRepo;
     private final UserRepository userRepo;
     private final DigitalSignatureRepository sigRepo;
-    private final DocuSignClient docusignClient;
+    private final DocuSignClient docuSignClient;
 
     @Transactional
     public DigitalSignatureResponseDTO createSignatureMock(UUID appId, UUID userId) {
@@ -31,11 +31,24 @@ public class DigitalSignatureService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         // Crear registro (status created)
-        var sig = new DigitalSignature(app, user, "MOCK");
-        sigRepo.save(sig);
+        var sig = new DigitalSignature();
+        sig.setUser(user);
+        sig.setProvider("MOCK");
+        sig.setDocumentHash("MOCK");
+        sig.setSignatureDocument("MOCK");
+        sig.setStatus("created");
+
+// Enlazar bidireccional
+        sig.setApplication(app);
+        app.setSignature(sig);
+
+// Guardar
+        sigRepo.save(sig);   // columna application_id ahora no será nula
+
+
 
         // Simular sesión de firma y actualizar (status sent)
-        var session = docusignClient.createEmbeddedSigning(
+        var session = docuSignClient.createEmbeddedSigning(
                 user.getName() + " " + user.getLastName(),
                 user.getEmail(),
                 user.getId().toString()

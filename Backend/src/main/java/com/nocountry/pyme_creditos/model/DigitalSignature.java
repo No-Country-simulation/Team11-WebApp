@@ -22,9 +22,11 @@ public class DigitalSignature {
     private UUID id;
 
     // Firma vinculada a una aplicación de crédito
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "application_id", nullable = false)
     private CreditApplication application;
+
+
 
     /**
      // Relación UNO-a-UNO con User (cada usuario tiene UNA firma)
@@ -53,6 +55,10 @@ public class DigitalSignature {
     // Documento de firma (podría ser PDF, imagen, etc.)
     @Column(name = "signature_document", columnDefinition = "TEXT")
     private String signatureDocument; // Puede ser Base64, URL, o path al archivo
+
+    @Column(name = "document_hash", nullable = false)
+    private String documentHash;
+
 
     // Fecha de creación
     @Column(name = "createdAt", nullable = false)
