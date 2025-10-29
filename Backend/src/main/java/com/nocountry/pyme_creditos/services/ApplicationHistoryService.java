@@ -5,6 +5,8 @@ import com.nocountry.pyme_creditos.model.CreditApplication;
 import com.nocountry.pyme_creditos.model.User;
 import com.nocountry.pyme_creditos.enums.CreditStatus;
 import com.nocountry.pyme_creditos.repository.ApplicationHistoryRepository;
+import com.nocountry.pyme_creditos.repository.UserRepository;
+import com.nocountry.pyme_creditos.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -22,6 +24,8 @@ import java.util.UUID;
 public class ApplicationHistoryService {
 
     private final ApplicationHistoryRepository applicationHistoryRepository;
+    private final UserRepository userRepository;
+    private final SecurityUtils securityUtils;
 
     // ✅ Registrar cambio de estado
     public void recordStatusChange(CreditApplication application, CreditStatus previousStatus,
@@ -51,13 +55,12 @@ public class ApplicationHistoryService {
     }
 
     // ✅ Obtener usuario actual desde Spring Security
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("Usuario no autenticado");
-        }
 
-        // Asumiendo que tu UserDetailsService retorna tu entidad User
-        return (User) authentication.getPrincipal();
+
+    private User getCurrentUser() {
+        UUID userId = securityUtils.getCurrentUserId(); // obtener ID real de tu usuario
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
+
 }

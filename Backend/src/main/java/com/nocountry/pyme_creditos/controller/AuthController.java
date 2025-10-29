@@ -2,6 +2,8 @@ package com.nocountry.pyme_creditos.controller;
 
 import com.nocountry.pyme_creditos.dto.LoginRequestDto;
 import com.nocountry.pyme_creditos.dto.LoginResponseDto;
+import com.nocountry.pyme_creditos.model.User;
+import com.nocountry.pyme_creditos.repository.UserRepository;
 import com.nocountry.pyme_creditos.security.JwtUtilRsa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -22,6 +24,7 @@ public class AuthController {
     @Autowired private AuthenticationManager authenticationManager;
     @Autowired private UserDetailsService userDetailsService;
     @Autowired private JwtUtilRsa jwtUtilRsa;
+    @Autowired private UserRepository userRepository;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto req) {
@@ -40,7 +43,16 @@ public class AuthController {
 
             String token = jwtUtilRsa.generateToken(userDetails.getUsername(), Map.of("roles", roles));
 
-            return ResponseEntity.ok(new LoginResponseDto(token, userDetails.getUsername(), roles));
+            // Obtener el usuario de la base de datos para el id
+            User user = userRepository.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+            return ResponseEntity.ok(new LoginResponseDto(
+                    user.getId(),                  // UUID
+                    token,                         // token JWT
+                    userDetails.getUsername(),     // email
+                    roles                          // roles
+            ));
 
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

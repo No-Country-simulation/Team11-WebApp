@@ -15,6 +15,7 @@ public class SecurityUtils {
 
     private final UserRepository userRepository;
 
+
     /**
      * Obtiene el userId del usuario autenticado.
      */

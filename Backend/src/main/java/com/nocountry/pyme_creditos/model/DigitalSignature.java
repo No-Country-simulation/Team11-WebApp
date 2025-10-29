@@ -27,10 +27,10 @@ public class DigitalSignature {
     private CreditApplication application;
 
     /**
-    // Relación UNO-a-UNO con User (cada usuario tiene UNA firma)
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", unique = true, nullable = false)
-    private Company company;*/
+     // Relación UNO-a-UNO con User (cada usuario tiene UNA firma)
+     @OneToOne(fetch = FetchType.LAZY)
+     @JoinColumn(name = "company_id", unique = true, nullable = false)
+     private Company company;*/
 
     // Usuario que firmó (representante de la empresa)
     @ManyToOne(fetch = FetchType.LAZY)

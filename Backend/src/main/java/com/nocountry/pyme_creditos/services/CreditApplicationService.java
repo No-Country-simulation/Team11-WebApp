@@ -136,6 +136,16 @@ public class CreditApplicationService {
             throw new IllegalStateException("Debe aceptar los términos y condiciones para enviar la aplicación");
         }
 
+        // Antes de cambiar a PENDING
+        var signature = application.getSignature();
+        if (signature == null) {
+            throw new IllegalStateException("La aplicación no puede enviarse sin que el representante firme previamente");
+        }
+        if (!"completed".equals(signature.getStatus())) {
+            throw new IllegalStateException("La firma de la aplicación debe estar completada antes de enviar");
+        }
+
+
 
         // Cambiar estado a PENDING (al hacer submit, se cambia a pending)
         application.setCreditStatus(CreditStatus.PENDING);
