@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,8 +18,6 @@ public interface CreditApplicationRepository extends JpaRepository<CreditApplica
 
     // ✅ CORREGIDO: Cambiar Long por UUID
     List<CreditApplication> findByCompanyId(UUID companyId);
-
-    List<CreditApplication> findByCreditStatus(CreditStatus status);
 
     List<CreditApplication> findByCreditType(CreditType creditType);
 
@@ -40,4 +39,6 @@ public interface CreditApplicationRepository extends JpaRepository<CreditApplica
                                            @Param("creditType") CreditType creditType);
 
     Long countByCreditStatus(CreditStatus status);
+
+
 }
