@@ -3,17 +3,16 @@ package com.nocountry.pyme_creditos.services;
 import com.nocountry.pyme_creditos.dto.CreditApplicationRequestDTO;
 import com.nocountry.pyme_creditos.dto.CreditApplicationResponseDTO;
 import com.nocountry.pyme_creditos.dto.CreditApplicationUpdateDTO;
+
+import com.nocountry.pyme_creditos.dto.DigitalConsentRequestDTO;
+
 import com.nocountry.pyme_creditos.dto.StatusUpdateRequestDTO;
 import com.nocountry.pyme_creditos.model.CreditApplication;
 import com.nocountry.pyme_creditos.model.Company;
 import com.nocountry.pyme_creditos.enums.CreditStatus;
-import com.nocountry.pyme_creditos.enums.CreditType;
-import com.nocountry.pyme_creditos.model.Document;
 import com.nocountry.pyme_creditos.repository.CreditApplicationRepository;
-import com.nocountry.pyme_creditos.repository.CompanyRepository;
-import com.nocountry.pyme_creditos.repository.DocumentRepository;
+import com.nocountry.pyme_creditos.repository.DigitalSignatureRepository;
 import com.nocountry.pyme_creditos.security.SecurityUtils;
-import com.nocountry.pyme_creditos.services.ApplicationHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,6 +33,8 @@ public class CreditApplicationService {
     private final ApplicationHistoryService historyService; // Para auditoría
     private final SecurityUtils securityUtils;
     private final CompanyService companyService;
+    private final DigitalSignatureRepository signatureRepo;
+    private final DigitalSignatureService signatureService;
 
 
 
@@ -69,6 +70,55 @@ public class CreditApplicationService {
         log.info("Aplicación creada exitosamente con ID: {}", savedApplication.getId());
 
         return new CreditApplicationResponseDTO(savedApplication);
+    }
+
+    // ✅ Adjuntar firma y consentimiento ANTES de /submit
+    public CreditApplicationResponseDTO attachSignature(UUID applicationId, UUID currentUserId, DigitalConsentRequestDTO req) {
+        log.info("Adjuntando firma a aplicación {} por el usuario {}", applicationId, currentUserId);
+
+        // 1) Buscar aplicación
+        CreditApplication app = creditApplicationRepository.findById(applicationId)
+                .orElseThrow(() -> new RuntimeException("Aplicación no encontrada con ID: " + applicationId));
+
+        // 2) Validar ownership: el dueño de la company debe ser el usuario actual
+        UUID ownerId = app.getCompany().getUser().getId();
+        if (!ownerId.equals(currentUserId)) {
+            throw new SecurityException("No autorizado: la aplicación no pertenece al usuario actual");
+        }
+
+        // 3) Validar estado: solo en SAVE
+        if (app.getCreditStatus() != CreditStatus.SAVE) {
+            throw new IllegalStateException("La firma sólo puede adjuntarse antes del envío (estado SAVE)");
+        }
+
+        // 4) Validar consentimiento
+        if (req.getConsent() == null || !req.getConsent()) {
+            throw new IllegalArgumentException("Debe aceptar el consentimiento (checkbox)");
+        }
+
+        // 5) Crear sesión de firma (MOCK) y registro DigitalSignature (status=sent)
+        var session = signatureService.createSignatureMock(app.getId(), currentUserId);
+
+        // 6) Recuperar la firma recién creada y completar datos opcionales
+        var signature = signatureRepo.findById(session.getSignatureId())
+                .orElseThrow(() -> new IllegalStateException("Inconsistencia: firma recién creada no encontrada"));
+
+        if (req.getSignatureDocument() != null && !req.getSignatureDocument().isBlank()) {
+            // Si tu mock ya produce un “documento” preliminar
+            signature.setSignatureDocument(req.getSignatureDocument());
+            signatureRepo.save(signature);
+        }
+
+        // 7) Linkear en la aplicación y marcar checkbox
+        app.setSignature(signature);
+        app.setApplicationCheckbox(true);
+        CreditApplication updated = creditApplicationRepository.save(app);
+
+        log.info("Firma adjuntada a la aplicación {}. signatureId={}, status={}",
+                applicationId, signature.getId(), signature.getStatus());
+
+        // 8) Devolver respuesta usando tu DTO(entity)
+        return new CreditApplicationResponseDTO(updated);
     }
 
     // ✅ SUBMIT - Enviar aplicación (cambia de SAVE a PENDING)
