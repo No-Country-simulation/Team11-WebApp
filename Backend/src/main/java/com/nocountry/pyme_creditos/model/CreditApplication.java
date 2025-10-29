@@ -8,6 +8,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -75,6 +76,10 @@ public class CreditApplication {
 
     @Column(name = "updatedAt", nullable = false)
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "application", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Document> documents;
+
 
     // Constructor vacío para JPA
     public CreditApplication() {}

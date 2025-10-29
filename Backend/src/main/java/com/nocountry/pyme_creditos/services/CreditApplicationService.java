@@ -2,13 +2,16 @@ package com.nocountry.pyme_creditos.services;
 
 import com.nocountry.pyme_creditos.dto.CreditApplicationRequestDTO;
 import com.nocountry.pyme_creditos.dto.CreditApplicationResponseDTO;
+import com.nocountry.pyme_creditos.dto.CreditApplicationUpdateDTO;
 import com.nocountry.pyme_creditos.dto.StatusUpdateRequestDTO;
 import com.nocountry.pyme_creditos.model.CreditApplication;
 import com.nocountry.pyme_creditos.model.Company;
 import com.nocountry.pyme_creditos.enums.CreditStatus;
 import com.nocountry.pyme_creditos.enums.CreditType;
+import com.nocountry.pyme_creditos.model.Document;
 import com.nocountry.pyme_creditos.repository.CreditApplicationRepository;
 import com.nocountry.pyme_creditos.repository.CompanyRepository;
+import com.nocountry.pyme_creditos.repository.DocumentRepository;
 import com.nocountry.pyme_creditos.security.SecurityUtils;
 import com.nocountry.pyme_creditos.services.ApplicationHistoryService;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +30,12 @@ import java.util.stream.Collectors;
 public class CreditApplicationService {
 
     private final CreditApplicationRepository creditApplicationRepository;
-    private final CompanyRepository companyRepository;
+
     private final ApplicationHistoryService historyService; // Para auditoría
     private final SecurityUtils securityUtils;
     private final CompanyService companyService;
+
+
 
 
     // ✅ CREATE - Crear nueva aplicación (estado SAVE)
@@ -81,13 +86,9 @@ public class CreditApplicationService {
             throw new IllegalStateException("Debe aceptar los términos y condiciones para enviar la aplicación");
         }
 
-        // Cambiar estado a PENDING
+
+        // Cambiar estado a PENDING (al hacer submit, se cambia a pending)
         application.setCreditStatus(CreditStatus.PENDING);
-
-
-        historyService.recordStatusChange(application, CreditStatus.SAVE, CreditStatus.PENDING, "Aplicación enviada");
-
-
 
         // Registrar en historial (si tienes este servicio)
          historyService.recordStatusChange(application, CreditStatus.SAVE, CreditStatus.PENDING, "Aplicación enviada");
@@ -98,16 +99,7 @@ public class CreditApplicationService {
         return new CreditApplicationResponseDTO(updatedApplication);
     }
 
-    // ✅ READ - Obtener aplicación por ID
-    @Transactional(readOnly = true)
-    public CreditApplicationResponseDTO getApplicationById(UUID id) {
-        log.info("Buscando aplicación con ID: {}", id);
 
-        CreditApplication application = creditApplicationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Aplicación no encontrada con ID: " + id));
-
-        return new CreditApplicationResponseDTO(application);
-    }
 
     // ✅ READ - Obtener todas las aplicaciones de una compañía
     @Transactional(readOnly = true)
@@ -120,16 +112,7 @@ public class CreditApplicationService {
                 .collect(Collectors.toList());
     }
 
-    // ✅ READ - Obtener aplicaciones por estado (para operadores)
-    @Transactional(readOnly = true)
-    public List<CreditApplicationResponseDTO> getApplicationsByStatus(CreditStatus status) {
-        log.info("Buscando aplicaciones con estado: {}", status);
 
-        return creditApplicationRepository.findByCreditStatus(status)
-                .stream()
-                .map(CreditApplicationResponseDTO::new)
-                .collect(Collectors.toList());
-    }
 
     // ✅ UPDATE - Actualizar estado (para operadores)
     public CreditApplicationResponseDTO updateApplicationStatus(UUID applicationId, StatusUpdateRequestDTO requestDTO) {
@@ -161,8 +144,9 @@ public class CreditApplicationService {
     }
 
     // ✅ UPDATE - Actualizar aplicación (solo en estado SAVE)
-    public CreditApplicationResponseDTO updateApplication(UUID applicationId, CreditApplicationRequestDTO requestDTO) {
-        log.info("Actualizando aplicación con ID: {}", applicationId);
+    // ✅ UPDATE PARCIAL - Actualizar solo los campos que se envían (solo SAVE)
+    public CreditApplicationResponseDTO updateApplicationPartial(UUID applicationId, CreditApplicationUpdateDTO dto) {
+        log.info("Actualizando parcialmente aplicación con ID: {}", applicationId);
 
         CreditApplication application = creditApplicationRepository.findById(applicationId)
                 .orElseThrow(() -> new RuntimeException("Aplicación no encontrada con ID: " + applicationId));
@@ -172,18 +156,22 @@ public class CreditApplicationService {
             throw new IllegalStateException("Solo se pueden modificar aplicaciones en estado SAVE (borrador)");
         }
 
-        // Actualizar campos
-        application.setCreditType(requestDTO.getCreditType());
-        application.setDescription(requestDTO.getDescription());
-        application.setRequestedAmount(requestDTO.getRequestedAmount());
-        application.setTermMonths(requestDTO.getTermMonths());
-        application.setApplicationCheckbox(requestDTO.getApplicationCheckbox());
+        // Aplicar solo campos que no sean null
+        if(dto.getCreditType() != null) application.setCreditType(dto.getCreditType());
+        if(dto.getDescription() != null) application.setDescription(dto.getDescription());
+        if(dto.getRequestedAmount() != null) application.setRequestedAmount(dto.getRequestedAmount());
+        if(dto.getTermMonths() != null) application.setTermMonths(dto.getTermMonths());
+        if(dto.getApplicationCheckbox() != null) application.setApplicationCheckbox(dto.getApplicationCheckbox());
+        if(dto.getMonthlyRevenue() != null) application.setMonthlyRevenue(dto.getMonthlyRevenue());
+        if(dto.getMonthlyExpenses() != null) application.setMonthlyExpenses(dto.getMonthlyExpenses());
+        if(dto.getCompanyYears() != null) application.setCompanyYears(dto.getCompanyYears());
 
         CreditApplication updatedApplication = creditApplicationRepository.save(application);
-        log.info("Aplicación {} actualizada exitosamente", applicationId);
+        log.info("Aplicación {} actualizada parcialmente exitosamente", applicationId);
 
         return new CreditApplicationResponseDTO(updatedApplication);
     }
+
 
     // ✅ DELETE - Eliminar aplicación (solo en estado SAVE)
     public void deleteApplication(UUID applicationId) {
