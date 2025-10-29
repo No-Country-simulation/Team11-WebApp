@@ -68,4 +68,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         chain.doFilter(request, response);
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        // Ignora el filtro para webhooks
+        return path.startsWith("/webhooks/");
+    }
+
 }

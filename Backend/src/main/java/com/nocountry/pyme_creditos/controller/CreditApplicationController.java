@@ -2,6 +2,7 @@ package com.nocountry.pyme_creditos.controller;
 
 import com.nocountry.pyme_creditos.dto.CreditApplicationRequestDTO;
 import com.nocountry.pyme_creditos.dto.CreditApplicationResponseDTO;
+import com.nocountry.pyme_creditos.dto.DigitalConsentRequestDTO;
 import com.nocountry.pyme_creditos.dto.StatusUpdateRequestDTO;
 import com.nocountry.pyme_creditos.enums.CreditStatus;
 import com.nocountry.pyme_creditos.security.SecurityUtils;
@@ -39,6 +40,16 @@ public class CreditApplicationController {
 
         CreditApplicationResponseDTO response = creditApplicationService.createApplication(requestDTO);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{id}/signature")
+    public ResponseEntity<CreditApplicationResponseDTO> attachSignature(
+            @PathVariable UUID id,
+            @Valid @RequestBody DigitalConsentRequestDTO request) {
+
+        UUID userId = securityUtils.getCurrentUserId();
+        CreditApplicationResponseDTO response = creditApplicationService.attachSignature(id, userId, request);
+        return ResponseEntity.ok(response);
     }
 
     // ✅ SUBMIT - Cliente envía aplicación (SAVE → PENDING)
