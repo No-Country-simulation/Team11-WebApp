@@ -32,6 +32,25 @@ export async function createCreditApplication(payload) {
 }
 
 /**
+ * Adjunta firma digital y consentimiento a una solicitud de crédito
+ * @param {string} applicationId - ID de la aplicación
+ * @param {{
+ *   consent: boolean,
+ *   signatureDocument: string
+ * }} payload - Datos del consentimiento digital
+ * @returns {Promise<any>} Respuesta del backend
+ */
+export async function attachDigitalSignature(applicationId, payload) {
+  const signaturePayload = {
+    consent: true, // Siempre debe ser true según el DTO
+    signatureDocument: payload.signatureDocument // URL, base64, o mock de la firma
+  };
+
+  const response = await api.post(`/api/credit-applications/${applicationId}/signature`, signaturePayload);
+  return response.data;
+}
+
+/**
  * Envía una solicitud de crédito (cambia estado SAVE → PENDING)
  * @param {string} applicationId - ID de la aplicación
  * @returns {Promise<any>} Respuesta del backend
@@ -50,8 +69,32 @@ export async function getCompanyCreditApplications() {
   return response.data;
 }
 
+/**
+ * Actualiza parcialmente una solicitud de crédito
+ * @param {string} applicationId - ID de la aplicación
+ * @param {Object} payload - Campos a actualizar
+ * @returns {Promise<any>} Respuesta del backend
+ */
+export async function updateCreditApplication(applicationId, payload) {
+  const response = await api.patch(`/api/credit-applications/${applicationId}`, payload);
+  return response.data;
+}
+
+/**
+ * Elimina una solicitud de crédito
+ * @param {string} applicationId - ID de la aplicación
+ * @returns {Promise<any>} Respuesta del backend
+ */
+export async function deleteCreditApplication(applicationId) {
+  const response = await api.delete(`/api/credit-applications/${applicationId}`);
+  return response.data;
+}
+
 export default {
   createCreditApplication,
+  attachDigitalSignature,
   submitCreditApplication,
   getCompanyCreditApplications,
+  updateCreditApplication,
+  deleteCreditApplication,
 };

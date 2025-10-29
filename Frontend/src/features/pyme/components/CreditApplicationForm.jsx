@@ -4,6 +4,7 @@ import { FileText, ArrowLeft, SquarePen } from "lucide-react";
 import {
   createCreditApplication,
   submitCreditApplication,
+  attachDigitalSignature,
 } from "../services/credit-application";
 import { uploadDocuments } from "../services/documents";
 import { toast } from "sonner";
@@ -106,7 +107,27 @@ const CreditApplicationForm = () => {
           }
         }
 
-        // 3. Enviar la aplicación (cambiar estado a PENDING)
+        // 3. Adjuntar firma digital y consentimiento
+        try {
+          toast.loading("Procesando firma digital...");
+          
+          // Crear payload para la firma digital
+          const signaturePayload = {
+            consent: true, // Siempre true según el DTO
+            signatureDocument: `digital-signature-${applicationId}-${Date.now()}` // Mock temporal
+          };
+
+          await attachDigitalSignature(applicationId, signaturePayload);
+          
+          toast.dismiss();
+          toast.success("✅ Firma digital procesada exitosamente");
+        } catch (signatureError) {
+          console.error("Error al procesar firma digital:", signatureError);
+          toast.error("⚠️ Solicitud creada pero hubo un error al procesar la firma digital");
+          // Continuamos aunque falle la firma digital
+        }
+
+        // 4. Enviar la aplicación (cambiar estado a PENDING)
         toast.loading("Enviando solicitud...");
         await submitCreditApplication(applicationId);
         toast.dismiss();
@@ -128,7 +149,6 @@ const CreditApplicationForm = () => {
       setIsSubmitting(false);
     }
   };
-
 
   const handleBack = () => {
     if (currentStep > 1) {
@@ -628,7 +648,7 @@ const CreditApplicationForm = () => {
                 htmlFor="digitalSignature"
                 className="block text-Green font-medium mb-2"
               >
-                Ingrese su Contraseña *
+                Ingrese su Contraseña para Firma Digital *
               </label>
               <input
                 id="digitalSignature"
@@ -637,6 +657,7 @@ const CreditApplicationForm = () => {
                   required: "Este campo es obligatorio",
                 })}
                 className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                placeholder="Ingrese su contraseña para autorizar la firma digital"
               />
               {errors.digitalSignature && (
                 <span className="text-red-500 text-sm block">
@@ -644,8 +665,9 @@ const CreditApplicationForm = () => {
                 </span>
               )}
               <p className="text-sm text-gray-600 mt-1">
-                Ingrese su contraseña (Tiene {timer} segundos).
-              </p>
+                Al ingresar su contraseña, autoriza la firma digital de su solicitud. 
+                Tiene {timer} segundos para completar este paso.
+              </p>                          
             </div>
           </>
         )}
@@ -678,7 +700,7 @@ const CreditApplicationForm = () => {
               : currentStep === 3
               ? "Guardar Solicitud"
               : currentStep === 4
-              ? "Enviar Solicitud"
+              ? "Firmar y Enviar Solicitud"
               : "Guardar y Continuar"}
           </button>
         </div>
