@@ -24,19 +24,7 @@ public class OperatorTaskController {
     private final OperatorTaskService operatorTaskService;
     private final CreditApplicationService creditApplicationService;
 
-    // ✅ GET - Tareas por estado de crédito y tarea
-    @GetMapping("/tasks")
-    public ResponseEntity<List<OperatorTaskDTO>> getTasks(
-            @RequestParam(required = false) CreditStatus creditStatus,
-            @RequestParam(required = false) TaskStatus taskStatus) {
-        return ResponseEntity.ok(operatorTaskService.getTasks(creditStatus, taskStatus));
-    }
 
-    // ✅ GET - Tarea específica
-    @GetMapping("/{taskId}")
-    public ResponseEntity<OperatorTaskDTO> getTaskById(@PathVariable UUID taskId) {
-        return ResponseEntity.ok(operatorTaskService.getTaskById(taskId));
-    }
 
     // ✅ PUT - Actualizar estado de aplicación
     @PutMapping("/{applicationId}/status")
@@ -48,9 +36,12 @@ public class OperatorTaskController {
         );
     }
 
+
     // ✅ GET - Aplicaciones para revisión
     @GetMapping("/applications/for-review")
     public ResponseEntity<List<CreditApplicationResponseDTO>> getApplicationsForReview() {
         return ResponseEntity.ok(creditApplicationService.getApplicationsForReview());
     }
+
+    //Aprovar credito, solo en revision y pendiente
 }

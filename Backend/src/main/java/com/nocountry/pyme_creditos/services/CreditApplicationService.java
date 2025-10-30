@@ -171,7 +171,7 @@ public class CreditApplicationService {
 
         // Registrar en historial
         historyService.recordStatusChange(application, previousStatus, newStatus, requestDTO.getComments());
-        // historyService.recordStatusChange(application, previousStatus, newStatus, requestDTO.getComments());
+
 
         CreditApplication updatedApplication = creditApplicationRepository.save(application);
         log.info("Estado de aplicación {} actualizado exitosamente", applicationId);
@@ -179,7 +179,7 @@ public class CreditApplicationService {
         return new CreditApplicationResponseDTO(updatedApplication);
     }
 
-    // ✅ UPDATE - Actualizar aplicación (solo en estado SAVE)
+
     // ✅ UPDATE PARCIAL - Actualizar solo los campos que se envían (solo SAVE)
     public CreditApplicationResponseDTO updateApplicationPartial(UUID applicationId, CreditApplicationUpdateDTO dto) {
         log.info("Actualizando parcialmente aplicación con ID: {}", applicationId);
@@ -238,8 +238,7 @@ public class CreditApplicationService {
     private boolean isValidStatusTransition(CreditStatus from, CreditStatus to) {
         return switch (from) {
             case SAVE -> to == CreditStatus.PENDING;
-            case PENDING -> to == CreditStatus.UNDER_REVIEW || to == CreditStatus.CANCELLED;
-            case UNDER_REVIEW -> to == CreditStatus.APPROVED || to == CreditStatus.REJECTED;
+            case PENDING -> to == CreditStatus.APPROVED || to == CreditStatus.REJECTED || to == CreditStatus.CANCELLED;
             case APPROVED, REJECTED, CANCELLED -> false; // Estados finales
         };
     }
