@@ -18,16 +18,18 @@ export async function createCreditApplication(payload) {
   // Mapear los datos del formulario al formato que espera el backend
   const backendPayload = {
     creditType: payload.creditType,
-    description: payload.description || `Solicitud de crédito para ${payload.creditPurpose}`,
+    description:
+      payload.description ||
+      `Solicitud de crédito para ${payload.creditPurpose}`,
     requestedAmount: parseFloat(payload.requestedAmount),
     termMonths: parseInt(payload.termMonths),
     monthlyRevenue: parseFloat(payload.monthlyRevenue),
     monthlyExpenses: parseFloat(payload.monthlyExpenses),
     companyYears: parseInt(payload.companyYears),
-    applicationCheckbox: true // Siempre true porque el usuario aceptó los términos
+    applicationCheckbox: true, // Siempre true porque el usuario aceptó los términos
   };
 
-  const response = await api.post('/api/credit-applications', backendPayload);
+  const response = await api.post("/api/credit-applications", backendPayload);
   return response.data;
 }
 
@@ -43,10 +45,26 @@ export async function createCreditApplication(payload) {
 export async function attachDigitalSignature(applicationId, payload) {
   const signaturePayload = {
     consent: true, // Siempre debe ser true según el DTO
-    signatureDocument: payload.signatureDocument // URL, base64, o mock de la firma
+    signatureDocument: payload.signatureDocument, // URL, base64, o mock de la firma
   };
 
-  const response = await api.post(`/api/credit-applications/${applicationId}/signature`, signaturePayload);
+  // 1. Primero llamar al endpoint de firma
+  const response = await api.post(
+    `/api/credit-applications/${applicationId}/signature`,
+    signaturePayload
+  );
+
+  // 2. Usar la respuesta para llamar automáticamente al webhook
+  if (response.data.envelopeId) {
+    const webhookPayload = {
+      envelopeId: response.data.envelopeId,
+      documentRef: response.data.provider || "MOCK",
+    };
+
+    // Llamar al webhook (puede ser en segundo plano sin esperar respuesta si prefieres)
+    await api.post("/webhooks/docusign", webhookPayload);
+  }
+
   return response.data;
 }
 
@@ -56,7 +74,9 @@ export async function attachDigitalSignature(applicationId, payload) {
  * @returns {Promise<any>} Respuesta del backend
  */
 export async function submitCreditApplication(applicationId) {
-  const response = await api.post(`/api/credit-applications/${applicationId}/submit`);
+  const response = await api.post(
+    `/api/credit-applications/${applicationId}/submit`
+  );
   return response.data;
 }
 
@@ -65,7 +85,7 @@ export async function submitCreditApplication(applicationId) {
  * @returns {Promise<any>} Lista de aplicaciones
  */
 export async function getCompanyCreditApplications() {
-  const response = await api.get('/api/credit-applications/company');
+  const response = await api.get("/api/credit-applications/company");
   return response.data;
 }
 
@@ -76,7 +96,10 @@ export async function getCompanyCreditApplications() {
  * @returns {Promise<any>} Respuesta del backend
  */
 export async function updateCreditApplication(applicationId, payload) {
-  const response = await api.patch(`/api/credit-applications/${applicationId}`, payload);
+  const response = await api.patch(
+    `/api/credit-applications/${applicationId}`,
+    payload
+  );
   return response.data;
 }
 
@@ -86,7 +109,9 @@ export async function updateCreditApplication(applicationId, payload) {
  * @returns {Promise<any>} Respuesta del backend
  */
 export async function deleteCreditApplication(applicationId) {
-  const response = await api.delete(`/api/credit-applications/${applicationId}`);
+  const response = await api.delete(
+    `/api/credit-applications/${applicationId}`
+  );
   return response.data;
 }
 

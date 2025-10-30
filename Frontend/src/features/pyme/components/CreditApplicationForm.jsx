@@ -9,6 +9,7 @@ import {
 import { uploadDocuments } from "../services/documents";
 import { toast } from "sonner";
 import { getDocumentTypeFromFile } from "../helpers/DocumentType";
+import { extractApiErrorMessage } from "../../../share/utils/httpError";
 
 const CreditApplicationForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -84,25 +85,29 @@ const CreditApplicationForm = () => {
         if (applicationData.documents && applicationData.documents.length > 0) {
           try {
             toast.loading("Subiendo documentos...");
-          
+
             // Convertir FileList a Array y mapear tipos
             const filesArray = Array.from(applicationData.documents);
-            const documentTypes = filesArray.map(file => 
+            const documentTypes = filesArray.map((file) =>
               getDocumentTypeFromFile(file)
             );
-  
+
             console.log("Subiendo documentos:", {
-              files: filesArray.map(f => f.name),
-              types: documentTypes
+              files: filesArray.map((f) => f.name),
+              types: documentTypes,
             });
-  
+
             await uploadDocuments(applicationId, filesArray, documentTypes);
-            
+
             toast.dismiss();
-            toast.success(`✅ ${filesArray.length} documento(s) subido(s) exitosamente`);
+            toast.success(
+              `✅ ${filesArray.length} documento(s) subido(s) exitosamente`
+            );
           } catch (uploadError) {
             console.error("Error al subir documentos:", uploadError);
-            toast.error("⚠️ Solicitud creada pero hubo un error al subir algunos documentos");
+            toast.error(
+              "⚠️ Solicitud creada pero hubo un error al subir algunos documentos"
+            );
             // Continuamos aunque falle la subida de documentos
           }
         }
@@ -110,20 +115,22 @@ const CreditApplicationForm = () => {
         // 3. Adjuntar firma digital y consentimiento
         try {
           toast.loading("Procesando firma digital...");
-          
+
           // Crear payload para la firma digital
           const signaturePayload = {
             consent: true, // Siempre true según el DTO
-            signatureDocument: `digital-signature-${applicationId}-${Date.now()}` // Mock temporal
+            signatureDocument: `digital-signature-${applicationId}-${Date.now()}`, // Mock temporal
           };
 
           await attachDigitalSignature(applicationId, signaturePayload);
-          
+
           toast.dismiss();
           toast.success("✅ Firma digital procesada exitosamente");
         } catch (signatureError) {
           console.error("Error al procesar firma digital:", signatureError);
-          toast.error("⚠️ Solicitud creada pero hubo un error al procesar la firma digital");
+          toast.error(
+            "⚠️ Solicitud creada pero hubo un error al procesar la firma digital"
+          );
           // Continuamos aunque falle la firma digital
         }
 
@@ -131,7 +138,7 @@ const CreditApplicationForm = () => {
         toast.loading("Enviando solicitud...");
         await submitCreditApplication(applicationId);
         toast.dismiss();
-        toast.success("🎉 Solicitud de crédito enviada exitosamente");
+        toast.success("Solicitud de crédito enviada");
 
         console.log("✅ Solicitud completa enviada:", response);
 
@@ -141,10 +148,13 @@ const CreditApplicationForm = () => {
       }
     } catch (error) {
       console.error("Error al enviar la solicitud:", error);
-      toast.dismiss();
-      toast.error(
-        "❌ Error al enviar la solicitud. Por favor, intente nuevamente."
+      const errorText = extractApiErrorMessage(
+        error,
+        "Error al enviar la solicitud"
       );
+
+      toast.dismiss();
+      toast.error(errorText);
     } finally {
       setIsSubmitting(false);
     }
@@ -486,12 +496,14 @@ const CreditApplicationForm = () => {
                 className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
               <p className="text-sm text-gray-600 mt-1">
-                Formatos aceptados: .PDF 
-              </p>             
+                Formatos aceptados: .PDF
+              </p>
             </div>
 
             <p className="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg">
-              Nota: la información financiera y documentación respaldatoria son fundamentales para evaluar tu solicitud. Cuantos más comprobantes proporciones más ágil será el proceso de análisis.
+              Nota: la información financiera y documentación respaldatoria son
+              fundamentales para evaluar tu solicitud. Cuantos más comprobantes
+              proporciones más ágil será el proceso de análisis.
             </p>
           </>
         )}
@@ -588,7 +600,8 @@ const CreditApplicationForm = () => {
                   <div className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
                     {Array.from(formData.documents).map((file, index) => (
                       <p key={index} className="text-sm text-gray-600">
-                        📎 {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                        📎 {file.name} ({(file.size / 1024 / 1024).toFixed(2)}{" "}
+                        MB)
                       </p>
                     ))}
                   </div>
@@ -665,9 +678,9 @@ const CreditApplicationForm = () => {
                 </span>
               )}
               <p className="text-sm text-gray-600 mt-1">
-                Al ingresar su contraseña, autoriza la firma digital de su solicitud. 
-                Tiene {timer} segundos para completar este paso.
-              </p>                          
+                Al ingresar su contraseña, autoriza la firma digital de su
+                solicitud. Tiene {timer} segundos para completar este paso.
+              </p>
             </div>
           </>
         )}
