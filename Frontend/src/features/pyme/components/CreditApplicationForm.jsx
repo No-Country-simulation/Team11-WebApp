@@ -14,6 +14,7 @@ import { extractApiErrorMessage } from "../../../share/utils/httpError";
 const CreditApplicationForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({});
+  const [applicationId, setApplicationId] = useState(null); // Nuevo estado para guardar el ID
   const [timer, setTimer] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
@@ -22,39 +23,13 @@ const CreditApplicationForm = () => {
     formState: { errors },
     watch,
     setError,
+    reset,
   } = useForm({
     defaultValues: formData,
   });
 
-  const onSubmit = async (data) => {
-    const updatedData = { ...formData, ...data };
-    setFormData(updatedData);
-
-    if (currentStep < 3) {
-      setCurrentStep(currentStep + 1);
-      return;
-    }
-
-    if (currentStep === 3) {
-      setCurrentStep(4);
-      setTimer(120);
-      return;
-    }
-
-    // === Paso final (firma digital) ===
-    if (!updatedData.digitalSignature) {
-      setError("digitalSignature", {
-        type: "manual",
-        message: "Debe ingresar su contraseña de firma digital",
-      });
-      return;
-    }
-
-    // Enviar solicitud al backend
-    await handleSubmitApplication(updatedData);
-  };
-
-  const handleSubmitApplication = async (applicationData) => {
+  // Paso 3: Guardar solicitud (crear y subir documentos)
+  const handleSaveApplication = async (applicationData) => {
     try {
       setIsSubmitting(true);
 
@@ -76,10 +51,11 @@ const CreditApplicationForm = () => {
       toast.loading("Creando solicitud de crédito...");
       const response = await createCreditApplication(submitData);
       toast.dismiss();
-      toast.success("✅ Solicitud de crédito creada exitosamente");
+      toast.success("Solicitud de crédito creada");
 
       if (response.id) {
-        const applicationId = response.id;
+        const newApplicationId = response.id;
+        setApplicationId(newApplicationId); // Guardar el ID para usar en el paso 4
 
         // 2. Subir documentos si existen
         if (applicationData.documents && applicationData.documents.length > 0) {
@@ -97,7 +73,7 @@ const CreditApplicationForm = () => {
               types: documentTypes,
             });
 
-            await uploadDocuments(applicationId, filesArray, documentTypes);
+            await uploadDocuments(newApplicationId, filesArray, documentTypes);
 
             toast.dismiss();
             toast.success(
@@ -112,42 +88,70 @@ const CreditApplicationForm = () => {
           }
         }
 
-        // 3. Adjuntar firma digital y consentimiento
-        try {
-          toast.loading("Procesando firma digital...");
-
-          // Crear payload para la firma digital
-          const signaturePayload = {
-            consent: true, // Siempre true según el DTO
-            signatureDocument: `digital-signature-${applicationId}-${Date.now()}`, // Mock temporal
-          };
-
-          await attachDigitalSignature(applicationId, signaturePayload);
-
-          toast.dismiss();
-          toast.success("✅ Firma digital procesada exitosamente");
-        } catch (signatureError) {
-          console.error("Error al procesar firma digital:", signatureError);
-          toast.error(
-            "⚠️ Solicitud creada pero hubo un error al procesar la firma digital"
-          );
-          // Continuamos aunque falle la firma digital
-        }
-
-        // 4. Enviar la aplicación (cambiar estado a PENDING)
-        toast.loading("Enviando solicitud...");
-        await submitCreditApplication(applicationId);
-        toast.dismiss();
-        toast.success("Solicitud de crédito enviada");
-
-        console.log("✅ Solicitud completa enviada:", response);
-
-        // Resetear el formulario
-        setFormData({});
-        setCurrentStep(1);
+        // Avanzar al paso de firma digital
+        setCurrentStep(4);
+        setTimer(120);
       }
     } catch (error) {
-      console.error("Error al enviar la solicitud:", error);
+      console.error("Error al guardar la solicitud:", error);
+      const errorText = extractApiErrorMessage(
+        error,
+        "Error al guardar la solicitud"
+      );
+
+      toast.dismiss();
+      toast.error(errorText);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Paso 4: Firmar y enviar solicitud
+  const handleSignAndSubmit = async (applicationData) => {
+    try {
+      setIsSubmitting(true);
+
+      if (!applicationId) {
+        toast.error("No se encontró la solicitud a firmar");
+        return;
+      }
+
+      // 1. Adjuntar firma digital y consentimiento
+      try {
+        toast.loading("Procesando firma digital...");
+
+        // Crear payload para la firma digital
+        const signaturePayload = {
+          consent: true, // Siempre true según el DTO
+          signatureDocument: `digital-signature-${applicationId}-${Date.now()}`, // Mock temporal
+        };
+
+        await attachDigitalSignature(applicationId, signaturePayload);
+
+        toast.dismiss();
+        toast.success("✅ Firma digital procesada exitosamente");
+      } catch (signatureError) {
+        console.error("Error al procesar firma digital:", signatureError);
+        toast.error("Error al procesar la firma digital");
+        return; // No continuamos si falla la firma digital
+      }
+
+      // 2. Enviar la aplicación (cambiar estado a PENDING)
+      toast.loading("Enviando solicitud...");
+      await submitCreditApplication(applicationId);
+      toast.dismiss();
+      toast.success("Solicitud de crédito enviada exitosamente");
+
+      console.log("✅ Solicitud completa enviada:", applicationId);
+
+      // Resetear el formulario
+      reset();
+      setFormData({});
+      setApplicationId(null);
+      setCurrentStep(1);
+      
+    } catch (error) {
+      console.error("Error al firmar y enviar la solicitud:", error);
       const errorText = extractApiErrorMessage(
         error,
         "Error al enviar la solicitud"
@@ -157,6 +161,35 @@ const CreditApplicationForm = () => {
       toast.error(errorText);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const onSubmit = async (data) => {
+    const updatedData = { ...formData, ...data };
+    setFormData(updatedData);
+
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+      return;
+    }
+
+    // Paso 3: Guardar solicitud (crear + documentos)
+    if (currentStep === 3) {
+      await handleSaveApplication(updatedData);
+      return;
+    }
+
+    // Paso 4: Firmar y enviar (solo firma + envío)
+    if (currentStep === 4) {
+      if (!updatedData.digitalSignature) {
+        setError("digitalSignature", {
+          type: "manual",
+          message: "Debe ingresar su contraseña de firma digital",
+        });
+        return;
+      }
+
+      await handleSignAndSubmit(updatedData);
     }
   };
 
@@ -709,7 +742,7 @@ const CreditApplicationForm = () => {
             className="px-6 py-2 bg-Violet text-white rounded-lg font-medium hover:opacity-80 transition-opacity disabled:opacity-50"
           >
             {isSubmitting
-              ? "Enviando..."
+              ? "Procesando..."
               : currentStep === 3
               ? "Guardar Solicitud"
               : currentStep === 4
