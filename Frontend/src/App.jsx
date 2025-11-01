@@ -1,13 +1,14 @@
-import { useState } from 'react'
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./share/routes";
+import { Toaster } from "sonner";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <p className="text-green-500">Hello World!</p>
-    </>
-  )
+    <BrowserRouter>
+      <Toaster />
+      <AppRoutes />
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
