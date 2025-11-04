@@ -347,10 +347,10 @@ const Navbar = ({ variant = "home" }) => {
       {/* MODALES */}
       {showLogin && (
         <div
-          className="fixed inset-0 flex items-center justify-end z-50 p-4"
+          className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/40 overflow-y-auto"
           onClick={handleCloseModals}
         >
-          <div className="max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div className="max-w-md w-full max-h-[90vh] overflow-y-auto my-4" onClick={(e) => e.stopPropagation()}>
             <Login onClose={handleCloseModals} />
           </div>
         </div>
@@ -358,11 +358,11 @@ const Navbar = ({ variant = "home" }) => {
 
       {showRegister && (
         <div
-          className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/40"
+          className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/40 overflow-y-auto"
           onClick={handleCloseModals}
         >
           <div
-            className="max-w-2xl w-full"
+            className="max-w-2xl w-full max-h-[90vh] overflow-y-auto my-4"
             onClick={(e) => e.stopPropagation()}
           >
             <Register onClose={handleCloseModals} />
