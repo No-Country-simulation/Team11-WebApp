@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle, AlertCircle, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { registerClient, registerOperator } from '../services/register';
 import { extractApiErrorMessage } from '../../../share/utils/httpError';
@@ -51,6 +51,29 @@ const RegisterForm = ( {onClose} ) => {
   };
 
   const password = watch('password');
+
+  // Validar requisitos de contraseña en tiempo real
+  const passwordRequirements = useMemo(() => {
+    if (!password) {
+      return {
+        minLength: false,
+        hasUpperCase: false,
+        hasLowerCase: false,
+        hasNumber: false,
+        hasSpecialChar: false,
+      };
+    }
+
+    return {
+      minLength: password.length > 8,
+      hasUpperCase: /[A-Z]/.test(password),
+      hasLowerCase: /[a-z]/.test(password),
+      hasNumber: /[0-9]/.test(password),
+      hasSpecialChar: /[@$!%*?&]/.test(password),
+    };
+  }, [password]);
+
+  const isPasswordValid = Object.values(passwordRequirements).every(req => req === true);
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-Green rounded-sm shadow-md">
@@ -163,9 +186,16 @@ const RegisterForm = ( {onClose} ) => {
               type={showPassword ? 'text' : 'password'}
               {...register('password', {
                 required: 'Este campo es requerido',
-                pattern: {
-                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-                  message: 'La contraseña no cumple con los requisitos'
+                validate: (value) => {
+                  if (!value) return 'Este campo es requerido';
+                  const reqs = {
+                    minLength: value.length > 8,
+                    hasUpperCase: /[A-Z]/.test(value),
+                    hasLowerCase: /[a-z]/.test(value),
+                    hasNumber: /[0-9]/.test(value),
+                    hasSpecialChar: /[@$!%*?&]/.test(value),
+                  };
+                  return Object.values(reqs).every(req => req === true) || 'La contraseña no cumple con todos los requisitos';
                 }
               })}
               className="w-full px-4 py-2 border-1 bg-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 pr-10"
@@ -185,9 +215,69 @@ const RegisterForm = ( {onClose} ) => {
           )}
         </div>
 
-        <p className="text-sm text-white">
-          La Contraseña debe contener 8 caracteres, 1 mayúscula, 1 minúscula, 1 carácter numérico y un símbolo.
-        </p>
+        {/* Indicadores de requisitos de contraseña */}
+        {password && (
+          <div className="bg-transparent p-3">            
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                {passwordRequirements.minLength ? (
+                  <Check className="h-4 w-4 text-green-300" />
+                ) : (
+                  <X className="h-4 w-4 text-gray-300" />
+                )}
+                <span className={`text-xs ${passwordRequirements.minLength ? 'text-green-300' : 'text-gray-300'}`}>
+                  Más de 8 caracteres
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {passwordRequirements.hasUpperCase ? (
+                  <Check className="h-4 w-4 text-green-300" />
+                ) : (
+                  <X className="h-4 w-4 text-gray-300" />
+                )}
+                <span className={`text-xs ${passwordRequirements.hasUpperCase ? 'text-green-300' : 'text-gray-300'}`}>
+                  Al menos 1 letra mayúscula
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {passwordRequirements.hasLowerCase ? (
+                  <Check className="h-4 w-4 text-green-300" />
+                ) : (
+                  <X className="h-4 w-4 text-gray-300" />
+                )}
+                <span className={`text-xs ${passwordRequirements.hasLowerCase ? 'text-green-300' : 'text-gray-300'}`}>
+                  Al menos 1 letra minúscula
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {passwordRequirements.hasNumber ? (
+                  <Check className="h-4 w-4 text-green-300" />
+                ) : (
+                  <X className="h-4 w-4 text-gray-300" />
+                )}
+                <span className={`text-xs ${passwordRequirements.hasNumber ? 'text-green-300' : 'text-gray-300'}`}>
+                  Al menos 1 número
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {passwordRequirements.hasSpecialChar ? (
+                  <Check className="h-4 w-4 text-green-300" />
+                ) : (
+                  <X className="h-4 w-4 text-gray-300" />
+                )}
+                <span className={`text-xs ${passwordRequirements.hasSpecialChar ? 'text-green-300' : 'text-gray-300'}`}>
+                  Al menos 1 símbolo (@$!%*?&)
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!password && (
+          <p className="text-sm text-white">
+            La contraseña debe contener más de 8 caracteres, 1 mayúscula, 1 minúscula, 1 carácter numérico y un símbolo.
+          </p>
+        )}
 
         <div>
           <label htmlFor="repeatPassword" className="block text-white font-medium mb-2">
