@@ -59,3 +59,22 @@ export const getDocumentTypeFromFile = (file) => {
   // Si no encuentra coincidencia, usar FINANCIAL_STATEMENT como default (más común para créditos)
   return matchedType ? matchedType.type : "FINANCIAL_STATEMENT";
 };
+
+/**
+ * Traduce el tipo de documento del enum del backend a español
+ * @param {string} documentType - Tipo de documento del enum (ID_CARD, FINANCIAL_STATEMENT, etc.)
+ * @returns {string} Etiqueta en español
+ */
+export const getDocumentTypeLabel = (documentType) => {
+  const typeLabels = {
+    ID_CARD: "Cédula de Identidad",
+    FINANCIAL_STATEMENT: "Estado Financiero",
+    BALANCE_SHEET: "Balance General",
+    NOTARIAL_POWER: "Poder Notarial",
+    TAX_RETURN: "Declaración de Impuestos",
+    ADDRESS_PROOF: "Comprobante de Domicilio",
+    BANK_REFERENCE: "Referencia Bancaria",
+  };
+  
+  return typeLabels[documentType] || documentType;
+};

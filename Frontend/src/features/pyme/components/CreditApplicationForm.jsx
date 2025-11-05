@@ -1,22 +1,41 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { FileText, ArrowLeft, SquarePen } from "lucide-react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { FileText, ArrowLeft, SquarePen, Trash2, X } from "lucide-react";
 import {
   createCreditApplication,
+  updateCreditApplication,
   submitCreditApplication,
   attachDigitalSignature,
 } from "../services/credit-application";
-import { uploadDocuments } from "../services/documents";
+import {
+  uploadDocuments,
+  getApplicationDocuments,
+  deleteDocument,
+} from "../services/documents";
 import { toast } from "sonner";
-import { getDocumentTypeFromFile } from "../helpers/DocumentType";
+import {
+  getDocumentTypeFromFile,
+  getDocumentTypeLabel,
+} from "../helpers/DocumentType";
 import { extractApiErrorMessage } from "../../../share/utils/httpError";
+import { useCreditApplicationsStore } from "../store/useCreditApplicationsStore";
 
 const CreditApplicationForm = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const editId = searchParams.get("edit");
+  const isEditMode = !!editId;
+  const { applications } = useCreditApplicationsStore();
+
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({});
-  const [applicationId, setApplicationId] = useState(null); // Nuevo estado para guardar el ID
+  const [applicationId, setApplicationId] = useState(editId || null);
   const [timer, setTimer] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [existingDocuments, setExistingDocuments] = useState([]);
+  const [loadingDocuments, setLoadingDocuments] = useState(false);
+  const [documentsToDelete, setDocumentsToDelete] = useState([]);
   const {
     register,
     handleSubmit,
@@ -24,11 +43,92 @@ const CreditApplicationForm = () => {
     watch,
     setError,
     reset,
+    setValue,
   } = useForm({
     defaultValues: formData,
   });
 
-  // Paso 3: Guardar solicitud (crear y subir documentos)
+  // Función para cargar documentos existentes
+  const loadExistingDocuments = useCallback(async (appId) => {
+    if (!appId) return;
+
+    try {
+      setLoadingDocuments(true);
+      const docs = await getApplicationDocuments(appId);
+      setExistingDocuments(docs || []);
+    } catch (error) {
+      console.error("Error al cargar documentos:", error);
+      // No mostramos error si no hay documentos, es normal
+    } finally {
+      setLoadingDocuments(false);
+    }
+  }, []);
+
+  // Función para eliminar un documento
+  const handleDeleteDocument = async (documentId) => {
+    if (!window.confirm("¿Está seguro de que desea eliminar este documento?")) {
+      return;
+    }
+
+    try {
+      await deleteDocument(documentId);
+      setExistingDocuments(
+        existingDocuments.filter((doc) => doc.id !== documentId)
+      );
+      setDocumentsToDelete([...documentsToDelete, documentId]);
+      toast.success("Documento eliminado exitosamente");
+    } catch (error) {
+      console.error("Error al eliminar documento:", error);
+      toast.error("Error al eliminar el documento");
+    }
+  };
+
+  // Cargar datos cuando está en modo edición usando los datos del store
+  useEffect(() => {
+    if (!isEditMode || !editId) return;
+
+    // Buscar la aplicación en el store
+    const application = applications.find((app) => app.id === editId);
+
+    if (!application) {
+      toast.error("No se encontró la solicitud para editar");
+      navigate("/panel/mis-solicitudes/guardadas");
+      return;
+    }
+
+    // Mapear los datos del store al formato del formulario
+    const formDataToLoad = {
+      creditType: application.creditType,
+      requestedAmount: application.requestedAmount,
+      termMonths: application.termMonths?.toString(),
+      description: application.description,
+      monthlyRevenue: application.monthlyRevenue,
+      monthlyExpenses: application.monthlyExpenses,
+      companyYears: application.companyYears,
+    };
+
+    // Establecer valores en el formulario
+    Object.keys(formDataToLoad).forEach((key) => {
+      if (formDataToLoad[key] !== undefined && formDataToLoad[key] !== null) {
+        setValue(key, formDataToLoad[key]);
+      }
+    });
+
+    setFormData(formDataToLoad);
+    setApplicationId(editId);
+
+    // Cargar documentos existentes
+    loadExistingDocuments(editId);
+  }, [
+    isEditMode,
+    editId,
+    applications,
+    setValue,
+    navigate,
+    loadExistingDocuments,
+  ]);
+
+  // Paso 3: Guardar solicitud (crear/actualizar y subir documentos)
   const handleSaveApplication = async (applicationData) => {
     try {
       setIsSubmitting(true);
@@ -38,26 +138,36 @@ const CreditApplicationForm = () => {
         creditType: applicationData.creditType,
         requestedAmount: parseFloat(applicationData.requestedAmount),
         termMonths: parseInt(applicationData.termMonths),
-        description:
-          applicationData.description ||
-          `Solicitud de crédito para ${applicationData.creditPurpose}`,
+        description: applicationData.description || "Solicitud de crédito",
         monthlyRevenue: parseFloat(applicationData.monthlyRevenue),
         monthlyExpenses: parseFloat(applicationData.monthlyExpenses),
         companyYears: parseInt(applicationData.companyYears),
         applicationCheckbox: true,
       };
 
-      // 1. Crear la aplicación de crédito
-      toast.loading("Creando solicitud de crédito...");
-      const response = await createCreditApplication(submitData);
-      toast.dismiss();
-      toast.success("Solicitud de crédito creada");
+      let newApplicationId = applicationId;
 
-      if (response.id) {
-        const newApplicationId = response.id;
-        setApplicationId(newApplicationId); // Guardar el ID para usar en el paso 4
+      if (isEditMode && applicationId) {
+        // Modo edición: actualizar la solicitud existente
+        toast.loading("Actualizando solicitud de crédito...");
+        await updateCreditApplication(applicationId, submitData);
+        toast.dismiss();
+        toast.success("Solicitud de crédito actualizada");
+      } else {
+        // Modo creación: crear nueva solicitud
+        toast.loading("Creando solicitud de crédito...");
+        const response = await createCreditApplication(submitData);
+        toast.dismiss();
+        toast.success("Solicitud de crédito creada");
 
-        // 2. Subir documentos si existen
+        if (response.id) {
+          newApplicationId = response.id;
+          setApplicationId(newApplicationId);
+        }
+      }
+
+      if (newApplicationId) {
+        // 2. Subir documentos si existen (solo en modo creación o si hay nuevos documentos)
         if (applicationData.documents && applicationData.documents.length > 0) {
           try {
             toast.loading("Subiendo documentos...");
@@ -68,21 +178,21 @@ const CreditApplicationForm = () => {
               getDocumentTypeFromFile(file)
             );
 
-            console.log("Subiendo documentos:", {
-              files: filesArray.map((f) => f.name),
-              types: documentTypes,
-            });
-
             await uploadDocuments(newApplicationId, filesArray, documentTypes);
 
             toast.dismiss();
             toast.success(
               `✅ ${filesArray.length} documento(s) subido(s) exitosamente`
             );
+
+            // Recargar documentos si está en modo edición
+            if (isEditMode && newApplicationId) {
+              await loadExistingDocuments(newApplicationId);
+            }
           } catch (uploadError) {
             console.error("Error al subir documentos:", uploadError);
             toast.error(
-              "⚠️ Solicitud creada pero hubo un error al subir algunos documentos"
+              "⚠️ Solicitud guardada pero hubo un error al subir algunos documentos"
             );
             // Continuamos aunque falle la subida de documentos
           }
@@ -96,7 +206,9 @@ const CreditApplicationForm = () => {
       console.error("Error al guardar la solicitud:", error);
       const errorText = extractApiErrorMessage(
         error,
-        "Error al guardar la solicitud"
+        isEditMode
+          ? "Error al actualizar la solicitud"
+          : "Error al guardar la solicitud"
       );
 
       toast.dismiss();
@@ -141,15 +253,13 @@ const CreditApplicationForm = () => {
       await submitCreditApplication(applicationId);
       toast.dismiss();
       toast.success("Solicitud de crédito enviada exitosamente");
-
-      console.log("✅ Solicitud completa enviada:", applicationId);
-
-      // Resetear el formulario
+      
+      // Resetear el formulario y redirigir
       reset();
       setFormData({});
       setApplicationId(null);
       setCurrentStep(1);
-      
+      navigate("/panel/mis-solicitudes/pendientes");
     } catch (error) {
       console.error("Error al firmar y enviar la solicitud:", error);
       const errorText = extractApiErrorMessage(
@@ -233,7 +343,9 @@ const CreditApplicationForm = () => {
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-3xl text-Green font-bold mb-6">
-        Formulario Para Solicitar Crédito
+        {isEditMode
+          ? "Editar Solicitud de Crédito"
+          : "Formulario Para Solicitar Crédito"}
       </h1>
 
       <div className="flex items-center justify-between mb-6">
@@ -354,41 +466,6 @@ const CreditApplicationForm = () => {
                 </span>
               )}
               <p className="text-sm text-gray-600 mt-1">* Ejemplo: 18 meses</p>
-            </div>
-
-            <div>
-              <label
-                htmlFor="creditPurpose"
-                className="block text-Green font-medium mb-2"
-              >
-                Destino del crédito *
-              </label>
-              <select
-                id="creditPurpose"
-                {...register("creditPurpose", {
-                  required: "Este campo es obligatorio",
-                })}
-                className="w-full px-4 py-2 border text-Green rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-              >
-                <option value="">Seleccione una opción</option>
-                <option value="Compra de insumos" className="text-Green">
-                  Compra de insumos
-                </option>
-                <option value="Pago a proveedores" className="text-Green">
-                  Pago a proveedores
-                </option>
-                <option value="Expansión" className="text-Green">
-                  Expansión
-                </option>
-                <option value="Otro" className="text-Green">
-                  Otro
-                </option>
-              </select>
-              {errors.creditPurpose && (
-                <span className="text-red-500 text-sm">
-                  {errors.creditPurpose.message}
-                </span>
-              )}
             </div>
 
             <div>
@@ -518,7 +595,8 @@ const CreditApplicationForm = () => {
                 htmlFor="documents"
                 className="block text-Green font-medium mb-2"
               >
-                Adjuntar Documentación (Opcional)
+                Adjuntar Documentación {isEditMode ? "Adicional" : ""}{" "}
+                (Opcional)
               </label>
               <input
                 id="documents"
@@ -532,6 +610,57 @@ const CreditApplicationForm = () => {
                 Formatos aceptados: .PDF
               </p>
             </div>
+
+            {/* Mostrar documentos existentes en modo edición */}
+            {isEditMode && (
+              <div className="mt-4">
+                <label className="block text-Green font-medium mb-2">
+                  Documentos existentes
+                </label>
+                {loadingDocuments ? (
+                  <div className="flex justify-center py-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-Green"></div>
+                  </div>
+                ) : existingDocuments.length > 0 ? (
+                  <div className="space-y-2">
+                    {existingDocuments.map((doc) => (
+                      <div
+                        key={doc.id}
+                        className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100"
+                      >
+                        <div className="flex items-center gap-3 flex-1">
+                          <FileText className="h-5 w-5 text-gray-600" />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900">
+                              {doc.fileName ||
+                                doc.name ||
+                                `Documento ${doc.id}`}
+                            </p>
+                            {doc.documentType && (
+                              <p className="text-xs text-gray-500">
+                                Tipo: {getDocumentTypeLabel(doc.documentType)}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteDocument(doc.id)}
+                          className="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded transition-colors"
+                          title="Eliminar documento"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">
+                    No hay documentos adjuntos
+                  </p>
+                )}
+              </div>
+            )}
 
             <p className="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg">
               Nota: la información financiera y documentación respaldatoria son
@@ -581,15 +710,6 @@ const CreditApplicationForm = () => {
 
               <div>
                 <label className="block text-Green font-medium mb-2">
-                  Destino del crédito
-                </label>
-                <p className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
-                  {formData.creditPurpose}
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-Green font-medium mb-2">
                   Facturación mensual
                 </label>
                 <p className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
@@ -624,11 +744,31 @@ const CreditApplicationForm = () => {
                 </p>
               </div>
 
-              {/* Mostrar documentos cargados */}
+              {/* Mostrar documentos existentes (si está en modo edición) */}
+              {isEditMode && existingDocuments.length > 0 && (
+                <div className="col-span-2">
+                  <label className="block text-Green font-medium mb-2">
+                    Documentos existentes
+                  </label>
+                  <div className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 space-y-1">
+                    {existingDocuments.map((doc) => (
+                      <p key={doc.id} className="text-sm text-gray-600">
+                        📎 {doc.fileName || doc.name || `Documento ${doc.id}`}
+                        {doc.documentType &&
+                          ` (${getDocumentTypeLabel(doc.documentType)})`}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Mostrar documentos nuevos a subir */}
               {formData.documents && formData.documents.length > 0 && (
                 <div className="col-span-2">
                   <label className="block text-Green font-medium mb-2">
-                    Documentos adjuntos
+                    {isEditMode
+                      ? "Nuevos documentos a adjuntar"
+                      : "Documentos adjuntos"}
                   </label>
                   <div className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
                     {Array.from(formData.documents).map((file, index) => (
@@ -744,7 +884,9 @@ const CreditApplicationForm = () => {
             {isSubmitting
               ? "Procesando..."
               : currentStep === 3
-              ? "Guardar Solicitud"
+              ? isEditMode
+                ? "Actualizar Solicitud"
+                : "Guardar Solicitud"
               : currentStep === 4
               ? "Firmar y Enviar Solicitud"
               : "Guardar y Continuar"}

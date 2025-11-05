@@ -4,6 +4,7 @@ import {
   updateApplicationStatus,
   getDocumentsByApplication,
 } from "../services/credit-application";
+import { X, FileText, Download } from "lucide-react";
 
 export default function OperatorRequestsManagePage() {
   const [applications, setApplications] = useState([]);
@@ -182,11 +183,18 @@ export default function OperatorRequestsManagePage() {
 
   const getDocumentTypeLabel = (type) => {
     const types = {
-      IDENTIFICATION: "Identificación",
+      ID_CARD: "Cédula de Identidad",
       FINANCIAL_STATEMENT: "Estado Financiero",
+      BALANCE_SHEET: "Balance General",
+      NOTARIAL_POWER: "Poder Notarial",
+      TAX_RETURN: "Declaración de Impuestos",
+      ADDRESS_PROOF: "Comprobante de Domicilio",
+      BANK_REFERENCE: "Referencia Bancaria",
+      // Mantener compatibilidad con tipos antiguos si existen
+      IDENTIFICATION: "Cédula de Identidad",
       TAX_DECLARATION: "Declaración de Impuestos",
       BUSINESS_LICENSE: "Licencia Comercial",
-      BANK_STATEMENT: "Estado Bancario",
+      BANK_STATEMENT: "Referencia Bancaria",
       OTHER: "Otro",
     };
     return types[type] || type;
@@ -319,31 +327,37 @@ export default function OperatorRequestsManagePage() {
 
       {/* Modal de Revisión */}
       {showModal && selectedApplication && (
-        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-secondary-lighter max-w-4xl w-full max-h-[95vh] overflow-y-auto">
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/40 overflow-y-auto"
+          onClick={closeModal}
+        >
+          <div
+            className="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
-                <h3 className="text-xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-gray-900">
                   Revisar Solicitud - {selectedApplication.companyName}
-                </h3>
+                </h2>
                 <button
                   onClick={closeModal}
-                  className="text-gray-400 hover:text-gray-600 text-lg"
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  ✕
+                  <X className="h-6 w-6" />
                 </button>
               </div>
 
               {/* Información principal */}
               <div className="grid grid-cols-2 gap-6 mb-6">
                 <div className="col-span-2">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-gray-900 mb-3">
-                      Información de la PIME
-                    </h4>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Información de la PIME
+                  </h3>
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
                           Nombre de la Empresa
                         </label>
                         <p className="text-sm text-gray-900 font-semibold">
@@ -351,7 +365,7 @@ export default function OperatorRequestsManagePage() {
                         </p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
                           Años de Operación
                         </label>
                         <p className="text-sm text-gray-900">
@@ -359,25 +373,23 @@ export default function OperatorRequestsManagePage() {
                         </p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
                           Ingresos Mensuales
                         </label>
                         <p className="text-sm text-gray-900">
-                          $
-                          {selectedApplication.monthlyRevenue?.toLocaleString()}
+                          ${selectedApplication.monthlyRevenue?.toLocaleString()}
                         </p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
                           Gastos Mensuales
                         </label>
                         <p className="text-sm text-gray-900">
-                          $
-                          {selectedApplication.monthlyExpenses?.toLocaleString()}
+                          ${selectedApplication.monthlyExpenses?.toLocaleString()}
                         </p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
                           Rentabilidad Mensual
                         </label>
                         <p
@@ -391,7 +403,7 @@ export default function OperatorRequestsManagePage() {
                         </p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
                           Empleados
                         </label>
                         <p className="text-sm text-gray-900">
@@ -402,13 +414,13 @@ export default function OperatorRequestsManagePage() {
                   </div>
                 </div>
 
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-900 mb-3">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Detalles del Crédito
-                  </h4>
-                  <div className="space-y-3">
+                  </h3>
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Tipo
                       </label>
                       <p className="text-sm text-gray-900">
@@ -416,7 +428,7 @@ export default function OperatorRequestsManagePage() {
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Monto Solicitado
                       </label>
                       <p className="text-lg font-bold text-gray-900">
@@ -424,7 +436,7 @@ export default function OperatorRequestsManagePage() {
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Plazo
                       </label>
                       <p className="text-sm text-gray-900">
@@ -432,7 +444,7 @@ export default function OperatorRequestsManagePage() {
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Fecha de Envío
                       </label>
                       <p className="text-sm text-gray-900">
@@ -440,7 +452,7 @@ export default function OperatorRequestsManagePage() {
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Riesgo Estimado
                       </label>
                       <div className="flex items-center mt-1">
@@ -468,11 +480,11 @@ export default function OperatorRequestsManagePage() {
                 </div>
 
                 {/* Descripción */}
-                <div className="mb-6">
+                <div className="col-span-1">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Descripción de la solicitud
                   </label>
-                  <div className="p-3 bg-gray-50 rounded border border-gray-200">
+                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 min-h-[100px]">
                     <p className="text-sm text-gray-900">
                       {selectedApplication.description ||
                         "No se proporcionó descripción"}
@@ -482,23 +494,25 @@ export default function OperatorRequestsManagePage() {
               </div>
 
               {/* Documentos */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+              <div className="mb-6 border-t pt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
                   Documentos adjuntos
-                </label>
+                </h3>
                 {documentsLoading ? (
-                  <div className="text-center py-4">
-                    <p className="text-gray-500">Cargando documentos...</p>
+                  <div className="flex justify-center py-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600"></div>
                   </div>
                 ) : documents.length > 0 ? (
-                  <div className="bg-gray-50 rounded border border-gray-200">
-                    <div className="grid grid-cols-1 gap-2 p-3">
-                      {documents.map((document) => (
-                        <div
-                          key={document.id}
-                          className="flex items-center justify-between p-2 bg-white rounded border"
-                        >
-                          <div>
+                  <div className="space-y-2">
+                    {documents.map((document) => (
+                      <div
+                        key={document.id}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100"
+                      >
+                        <div className="flex items-center gap-3 flex-1">
+                          <FileText className="h-5 w-5 text-gray-600" />
+                          <div className="flex-1">
                             <p className="text-sm font-medium text-gray-900">
                               {getDocumentTypeLabel(document.documentType)}
                             </p>
@@ -506,25 +520,26 @@ export default function OperatorRequestsManagePage() {
                               {document.fileName || "Documento sin nombre"}
                             </p>
                           </div>
-                          <button
-                            onClick={() => handleViewDocument(document.id)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
-                          >
-                            Ver
-                          </button>
                         </div>
-                      ))}
-                    </div>
+                        <button
+                          onClick={() => handleViewDocument(document.id)}
+                          className="text-primary hover:text-primary-dark flex items-center gap-1 px-3 py-1 rounded transition-colors"
+                        >
+                          <Download className="h-4 w-4" />
+                          Ver
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 ) : (
-                  <div className="text-center py-4 bg-gray-50 rounded border border-gray-200">
-                    <p className="text-gray-500">No hay documentos adjuntos</p>
+                  <div className="text-center py-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <p className="text-gray-500 text-sm">No hay documentos adjuntos</p>
                   </div>
                 )}
               </div>
 
               {/* Comentarios de revisión */}
-              <div className="mb-6">
+              <div className="mb-6 border-t pt-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Comentarios de revisión *
                 </label>
@@ -532,7 +547,7 @@ export default function OperatorRequestsManagePage() {
                   value={reviewComments}
                   onChange={(e) => setReviewComments(e.target.value)}
                   placeholder="Ingresa los comentarios de la revisión..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 resize-none"
                   rows="4"
                   required
                 />
@@ -546,21 +561,21 @@ export default function OperatorRequestsManagePage() {
               <div className="flex space-x-3 justify-end border-t pt-4">
                 <button
                   onClick={closeModal}
-                  className="px-6 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 font-medium"
+                  className="px-6 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={() => handleStatusUpdate("REJECTED")}
                   disabled={!reviewComments.trim()}
-                  className="px-6 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed font-medium"
+                  className="px-6 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed font-medium transition-colors"
                 >
                   Rechazar Solicitud
                 </button>
                 <button
                   onClick={() => handleStatusUpdate("APPROVED")}
                   disabled={!reviewComments.trim()}
-                  className="px-6 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-green-300 disabled:cursor-not-allowed font-medium"
+                  className="px-6 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-green-300 disabled:cursor-not-allowed font-medium transition-colors"
                 >
                   Aprobar Solicitud
                 </button>

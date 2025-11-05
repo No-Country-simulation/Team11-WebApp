@@ -90,6 +90,16 @@ export async function getCompanyCreditApplications() {
 }
 
 /**
+ * Obtiene una solicitud de crédito por su ID
+ * @param {string} applicationId - ID de la aplicación
+ * @returns {Promise<any>} Aplicación de crédito
+ */
+export async function getCreditApplicationById(applicationId) {
+  const response = await api.get(`/api/credit-applications/${applicationId}`);
+  return response.data;
+}
+
+/**
  * Actualiza parcialmente una solicitud de crédito
  * @param {string} applicationId - ID de la aplicación
  * @param {Object} payload - Campos a actualizar
@@ -120,6 +130,7 @@ export default {
   attachDigitalSignature,
   submitCreditApplication,
   getCompanyCreditApplications,
+  getCreditApplicationById,
   updateCreditApplication,
   deleteCreditApplication,
 };

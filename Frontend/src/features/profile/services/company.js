@@ -16,8 +16,7 @@ import { api } from "../../../share/api/api";
 export async function createOrUpdateCompany(payload) {
   // Si el payload tiene ID, es una actualización
   if (payload.id) {
-    const { id, ...payloadWithoutId } = payload;
-    console.log(payloadWithoutId);
+    const { id, ...payloadWithoutId } = payload;    
     const response = await api.put(`/api/companies`, payloadWithoutId);
     return response.data;
   } else {
